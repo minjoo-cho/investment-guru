@@ -1,7 +1,7 @@
 // URL에서 투자자 ID 가져오기
 function getInvestorIdFromUrl() {
-    const pathParts = window.location.pathname.split('/');
-    return pathParts[pathParts.length - 1] || 'warren-buffett'; // 기본값은 워렌 버핏
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id') || 'warren-buffett'; // 기본값은 워렌 버핏
 }
 
 // 페이지 초기화

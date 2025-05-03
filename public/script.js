@@ -232,7 +232,7 @@ function renderInvestorCards() {
         const button = card.querySelector('button');
         button.addEventListener('click', function(e) {
             e.stopPropagation(); // 버블링 방지
-            window.location.href = `/investor/${investor.id}`;
+            window.location.href = `investor/index.html?id=${investor.id}`;
         });
         
         investorGrid.appendChild(card);

@@ -7,9 +7,9 @@ const investors = [
         quote: '다른 사람들이 두려워할 때 욕심내고, 다른 사람들이 욕심낼 때 두려워하라.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'AAPL', name: '애플', score: 95, change: 2.3, price: 184.92 },
-            { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 92, change: 1.5, price: 408.76 },
-            { symbol: 'KO', name: '코카콜라', score: 88, change: -0.7, price: 62.81 }
+            { symbol: 'AAPL', name: '애플', score: 95 },
+            { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 92 },
+            { symbol: 'KO', name: '코카콜라', score: 88 }
         ]
     },
     {
@@ -19,9 +19,9 @@ const investors = [
         quote: '주식을 지금 사야 할지 고민 중이라면, 그건 안 사는 게 맞다.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'SBUX', name: '스타벅스', score: 94, change: 1.8, price: 97.25 },
-            { symbol: 'COST', name: '코스트코', score: 91, change: 2.2, price: 732.88 },
-            { symbol: 'TGT', name: '타겟', score: 87, change: 0.5, price: 156.42 }
+            { symbol: 'SBUX', name: '스타벅스', score: 94 },
+            { symbol: 'COST', name: '코스트코', score: 91 },
+            { symbol: 'TGT', name: '타겟', score: 87 }
         ]
     },
     {
@@ -31,9 +31,9 @@ const investors = [
         quote: '투자는 철저한 분석, 약속된 안전성, 적절한 수익을 동반한다.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'PG', name: '프록터앤갬블', score: 93, change: 0.7, price: 162.35 },
-            { symbol: 'JNJ', name: '존슨앤존슨', score: 90, change: -0.3, price: 147.53 },
-            { symbol: 'JPM', name: 'JP모건', score: 88, change: 1.2, price: 198.78 }
+            { symbol: 'PG', name: '프록터앤갬블', score: 93 },
+            { symbol: 'JNJ', name: '존슨앤존슨', score: 90 },
+            { symbol: 'JPM', name: 'JP모건', score: 88 }
         ]
     },
     {
@@ -43,9 +43,9 @@ const investors = [
         quote: '당신이 무엇을 모르는지 아는 것이 중요하다.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'COST', name: '코스트코', score: 95, change: 2.2, price: 732.88 },
-            { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 91, change: 1.5, price: 408.76 },
-            { symbol: 'WFC', name: '웰스파고', score: 87, change: -0.5, price: 59.71 }
+            { symbol: 'COST', name: '코스트코', score: 95 },
+            { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 91 },
+            { symbol: 'WFC', name: '웰스파고', score: 87 }
         ]
     },
     {
@@ -55,9 +55,9 @@ const investors = [
         quote: '고통 + 성찰 = 진보',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'GLD', name: 'SPDR 골드', score: 96, change: 2.8, price: 215.67 },
-            { symbol: 'TLT', name: 'iShares 20+ 채권', score: 94, change: 0.4, price: 94.92 },
-            { symbol: 'VWO', name: '신흥국 ETF', score: 89, change: -1.2, price: 43.81 }
+            { symbol: 'GLD', name: 'SPDR 골드', score: 96 },
+            { symbol: 'TLT', name: 'iShares 20+ 채권', score: 94 },
+            { symbol: 'VWO', name: '신흥국 ETF', score: 89 }
         ]
     },
     {
@@ -67,9 +67,9 @@ const investors = [
         quote: '적절한 기업을 매수한 후에는 성급한 매도는 최악의 실수다.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'MSFT', name: '마이크로소프트', score: 97, change: 3.2, price: 417.82 },
-            { symbol: 'TSLA', name: '테슬라', score: 93, change: 4.5, price: 179.23 },
-            { symbol: 'NVDA', name: '엔비디아', score: 92, change: 2.7, price: 924.73 }
+            { symbol: 'MSFT', name: '마이크로소프트', score: 97 },
+            { symbol: 'TSLA', name: '테슬라', score: 93 },
+            { symbol: 'NVDA', name: '엔비디아', score: 92 }
         ]
     },
     {
@@ -79,9 +79,9 @@ const investors = [
         quote: '시간은 당신의 친구이며, 충동은 적이다.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'VTI', name: '토탈 마켓 ETF', score: 95, change: 1.3, price: 253.82 },
-            { symbol: 'VOO', name: 'S&P 500 ETF', score: 94, change: 1.2, price: 469.81 },
-            { symbol: 'BND', name: '토탈 채권 ETF', score: 90, change: 0.2, price: 74.53 }
+            { symbol: 'VTI', name: '토탈 마켓 ETF', score: 95 },
+            { symbol: 'VOO', name: 'S&P 500 ETF', score: 94 },
+            { symbol: 'BND', name: '토탈 채권 ETF', score: 90 }
         ]
     },
     {
@@ -91,9 +91,9 @@ const investors = [
         quote: '대부분의 사람들이 조심스러울 때는 공격적이어야 하고, 공격적일 때는 조심해야 한다.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'AMZN', name: '아마존', score: 92, change: 1.7, price: 183.26 },
-            { symbol: 'GOOGL', name: '알파벳', score: 90, change: 0.9, price: 174.49 },
-            { symbol: 'C', name: '시티그룹', score: 87, change: -0.8, price: 63.81 }
+            { symbol: 'AMZN', name: '아마존', score: 92 },
+            { symbol: 'GOOGL', name: '알파벳', score: 90 },
+            { symbol: 'C', name: '시티그룹', score: 87 }
         ]
     },
     {
@@ -103,9 +103,9 @@ const investors = [
         quote: '시장을 이기려면 더 많은 정보와 더 정확한 분석이 필요하다.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'GOOGL', name: '알파벳', score: 98, change: 0.9, price: 174.49 },
-            { symbol: 'AMZN', name: '아마존', score: 96, change: 1.7, price: 183.26 },
-            { symbol: 'MSFT', name: '마이크로소프트', score: 95, change: 3.2, price: 417.82 }
+            { symbol: 'GOOGL', name: '알파벳', score: 98 },
+            { symbol: 'AMZN', name: '아마존', score: 96 },
+            { symbol: 'MSFT', name: '마이크로소프트', score: 95 }
         ]
     },
     {
@@ -115,61 +115,47 @@ const investors = [
         quote: '다른 사람들이 외면하는 곳에서 기회를 찾아라.',
         image: 'https://via.placeholder.com/150',
         topStocks: [
-            { symbol: 'VXUS', name: '해외 주식 ETF', score: 96, change: 0.7, price: 60.24 },
-            { symbol: 'VWO', name: '신흥국 ETF', score: 92, change: -1.2, price: 43.81 },
-            { symbol: 'EWJ', name: '일본 ETF', score: 89, change: 0.5, price: 48.52 }
+            { symbol: 'VXUS', name: '해외 주식 ETF', score: 96 },
+            { symbol: 'VWO', name: '신흥국 ETF', score: 92 },
+            { symbol: 'EWJ', name: '일본 ETF', score: 89 }
         ]
     }
 ];
 
-// API 시뮬레이션: 주식 가격 가져오기
-async function fetchStockPrice(symbol) {
-    try {
-        // 실제로는 외부 API를 호출하여 데이터를 가져옴
-        // 지금은 현재 가격에 랜덤 변동을 주는 모의 함수 사용
-        const stockData = getBasePriceForSymbol(symbol);
-        const randomFactor = 0.98 + (Math.random() * 0.04); // ±2% 변동
-        
-        return {
-            price: parseFloat((stockData.price * randomFactor).toFixed(2)),
-            change: parseFloat(((randomFactor - 1) * 100).toFixed(1))
-        };
-    } catch (error) {
-        console.error(`Error fetching data for ${symbol}:`, error);
-        return null;
-    }
-}
+// 주식 변화에 따른 화살표 컴포넌트
+const ChangeArrow = ({ change }) => {
+    if (change > 0) return '<span class="up">↑</span>';
+    if (change < 0) return '<span class="down">↓</span>';
+    return '';
+};
 
-// 심볼별 기본 가격 정보 (모의 데이터)
-function getBasePriceForSymbol(symbol) {
-    const priceMap = {
-        'AAPL': { price: 184.92 },
-        'BRK-B': { price: 408.76 },
-        'KO': { price: 62.81 },
-        'SBUX': { price: 97.25 },
-        'COST': { price: 732.88 },
-        'TGT': { price: 156.42 },
-        'PG': { price: 162.35 },
-        'JNJ': { price: 147.53 },
-        'JPM': { price: 198.78 },
-        'WFC': { price: 59.71 },
-        'GLD': { price: 215.67 },
-        'TLT': { price: 94.92 },
-        'VWO': { price: 43.81 },
-        'MSFT': { price: 417.82 },
-        'TSLA': { price: 179.23 },
-        'NVDA': { price: 924.73 },
-        'VTI': { price: 253.82 },
-        'VOO': { price: 469.81 },
-        'BND': { price: 74.53 },
-        'VXUS': { price: 60.24 },
-        'AMZN': { price: 183.26 },
-        'GOOGL': { price: 174.49 },
-        'C': { price: 63.81 },
-        'EWJ': { price: 48.52 }
-    };
+// 대가 카드의 말풍선 컴포넌트
+function createStockBubble(stocks) {
+    let stockBubbleHTML = `<div class="stock-bubble">
+        <h4>추천 종목 Top 3</h4>
+        <ul>`;
     
-    return priceMap[symbol] || { price: 100.00 }; // 기본값 100.00
+    stocks.forEach(stock => {
+        const changeClass = stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
+        const changeSign = stock.change > 0 ? '+' : '';
+        const changeArrow = stock.change > 0 ? '↑' : stock.change < 0 ? '↓' : '';
+        
+        stockBubbleHTML += `
+            <li>
+                <div class="stock-details">
+                    <span>${stock.name}</span>
+                    <span class="symbol">${stock.symbol}</span>
+                </div>
+                <div>
+                    <span class="${changeClass}">${changeSign}${stock.change}% ${changeArrow}</span>
+                    <span class="price">$${stock.price ? stock.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '로딩중...'}</span>
+                </div>
+            </li>`;
+    });
+    
+    stockBubbleHTML += `</ul></div>`;
+    
+    return stockBubbleHTML;
 }
 
 // 투자자 카드 렌더링 함수
@@ -183,29 +169,7 @@ function renderInvestorCards() {
         card.dataset.id = investor.id;
         
         // 주식 말풍선 HTML 생성
-        let stockBubbleHTML = `<div class="stock-bubble">
-            <h4>추천 종목 Top 3</h4>
-            <ul>`;
-        
-        investor.topStocks.forEach(stock => {
-            const changeClass = stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
-            const changeSign = stock.change > 0 ? '+' : '';
-            const changeArrow = stock.change > 0 ? '↑' : stock.change < 0 ? '↓' : '';
-            
-            stockBubbleHTML += `
-                <li>
-                    <div class="stock-details">
-                        <span>${stock.name}</span>
-                        <span class="symbol">${stock.symbol}</span>
-                    </div>
-                    <div>
-                        <span class="${changeClass}">${changeSign}${stock.change}% ${changeArrow}</span>
-                        <span class="price">$${stock.price.toLocaleString()}</span>
-                    </div>
-                </li>`;
-        });
-        
-        stockBubbleHTML += `</ul></div>`;
+        const stockBubbleHTML = createStockBubble(investor.topStocks);
         
         // 카드 내용 HTML 생성
         card.innerHTML = `
@@ -239,6 +203,19 @@ function renderInvestorCards() {
     });
 }
 
+// 모든 투자자의 모든 주식 심볼 가져오기
+function getAllStockSymbols() {
+    const symbols = new Set();
+    
+    investors.forEach(investor => {
+        investor.topStocks.forEach(stock => {
+            symbols.add(stock.symbol);
+        });
+    });
+    
+    return Array.from(symbols);
+}
+
 // 주식 데이터 업데이트 함수
 async function updateStockData() {
     const refreshButton = document.getElementById('refresh-button');
@@ -247,27 +224,45 @@ async function updateStockData() {
     refreshIcon.style.transform = 'rotate(360deg)';
     refreshButton.disabled = true;
     
-    // 각 투자자의 각 주식에 대해 최신 가격 가져오기
-    for (const investor of investors) {
-        for (const stock of investor.topStocks) {
-            const data = await fetchStockPrice(stock.symbol);
-            if (data) {
-                stock.previousPrice = stock.price;
-                stock.price = data.price;
-                stock.change = data.change;
-            }
+    try {
+        // 모든 주식 심볼 가져오기
+        const allSymbols = getAllStockSymbols();
+        
+        // API가 로드되었는지 확인
+        if (!window.StockAPI) {
+            throw new Error('Stock API가 로드되지 않았습니다.');
         }
+        
+        // 모든 주식 데이터 가져오기
+        const stockData = await window.StockAPI.fetchMultipleStocks(allSymbols);
+        
+        // 각 투자자의 추천 종목 데이터 업데이트
+        investors.forEach(investor => {
+            investor.topStocks.forEach(stock => {
+                if (stockData[stock.symbol]) {
+                    stock.price = stockData[stock.symbol].price;
+                    stock.change = stockData[stock.symbol].change;
+                    stock.previousClose = stockData[stock.symbol].previousClose;
+                    stock.isMock = stockData[stock.symbol].isMock;
+                }
+            });
+        });
+        
+        // UI 업데이트
+        renderInvestorCards();
+        updateLastUpdatedTime();
+        
+        console.log('주식 데이터가 성공적으로 업데이트되었습니다.');
+    } catch (error) {
+        console.error('주식 데이터 업데이트 중 오류 발생:', error);
+        alert('주식 데이터를 가져오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+        // 리프레시 버튼 복원
+        setTimeout(() => {
+            refreshIcon.style.transform = 'rotate(0deg)';
+            refreshButton.disabled = false;
+        }, 500);
     }
-    
-    // UI 업데이트
-    renderInvestorCards();
-    updateLastUpdatedTime();
-    
-    // 리프레시 버튼 복원
-    setTimeout(() => {
-        refreshIcon.style.transform = 'rotate(0deg)';
-        refreshButton.disabled = false;
-    }, 500);
 }
 
 // 마지막 업데이트 시간 표시
@@ -279,11 +274,24 @@ function updateLastUpdatedTime() {
 
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', () => {
+    // 초기 카드 렌더링
     renderInvestorCards();
+    
+    // 초기 시간 설정
     updateLastUpdatedTime();
+    
+    // API 키 설정 (실제 API 키로 변경 필요)
+    if (window.StockAPI) {
+        window.StockAPI.setApiKey('YOUR_API_KEY_HERE');
+    }
     
     // 새로고침 버튼 이벤트
     document.getElementById('refresh-button').addEventListener('click', updateStockData);
+    
+    // 페이지 로드 후 데이터 가져오기
+    setTimeout(() => {
+        updateStockData();
+    }, 1000);
     
     // 5분마다 자동 업데이트
     setInterval(updateStockData, 5 * 60 * 1000);

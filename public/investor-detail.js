@@ -37,6 +37,16 @@ function initializeInvestorPage() {
     document.getElementById('refresh-button').addEventListener('click', function() {
         refreshStockData(investor);
     });
+    
+    // API 키 설정 (실제 API 키로 변경 필요)
+    if (window.StockAPI) {
+        window.StockAPI.setApiKey('YOUR_API_KEY_HERE');
+    }
+    
+    // 페이지 로드 후 실시간 데이터 가져오기
+    setTimeout(() => {
+        refreshStockData(investor);
+    }, 1000);
 }
 
 // 투자 지표 렌더링
@@ -114,7 +124,7 @@ function renderTableBody(columns, stocks) {
                     </span>
                 `;
             } else if (column.id === 'price') {
-                cell.textContent = `$${stock[column.id].toLocaleString()}`;
+                cell.textContent = stock[column.id] ? `$${stock[column.id].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '-';
             } else if (column.id === 'dividend') {
                 cell.textContent = `${stock[column.id]}%`;
             } else if (column.id === 'score') {
@@ -184,28 +194,47 @@ async function refreshStockData(investor) {
     refreshIcon.style.transform = 'rotate(360deg)';
     refreshButton.disabled = true;
     
-    // 실제로는 여기서 API를 호출하여 최신 데이터를 가져옴
-    // 지금은 모의 데이터로 랜덤 변화를 줌
-    const updatedStocks = investor.stocks.map(stock => {
-        const randomChange = (Math.random() * 2 - 1) * 2; // -2 ~ +2% 범위
-        const newPrice = stock.price * (1 + randomChange / 100);
+    try {
+        // 모든 주식 심볼 가져오기
+        const symbols = investor.stocks.map(stock => stock.symbol);
         
-        return {
-            ...stock,
-            price: parseFloat(newPrice.toFixed(2)),
-            change: parseFloat(randomChange.toFixed(1))
-        };
-    });
-    
-    // 테이블 업데이트
-    renderTableBody(investor.stockColumns, updatedStocks);
-    updateLastUpdatedTime();
-    
-    // 새로고침 버튼 복원
-    setTimeout(() => {
-        refreshIcon.style.transform = 'rotate(0deg)';
-        refreshButton.disabled = false;
-    }, 500);
+        // API가 로드되었는지 확인
+        if (!window.StockAPI) {
+            throw new Error('Stock API가 로드되지 않았습니다.');
+        }
+        
+        // 모든 주식 데이터 가져오기
+        const stockData = await window.StockAPI.fetchMultipleStocks(symbols);
+        
+        // 주식 데이터 업데이트
+        const updatedStocks = investor.stocks.map(stock => {
+            if (stockData[stock.symbol]) {
+                return {
+                    ...stock,
+                    price: stockData[stock.symbol].price,
+                    change: stockData[stock.symbol].change,
+                    previousClose: stockData[stock.symbol].previousClose,
+                    isMock: stockData[stock.symbol].isMock
+                };
+            }
+            return stock;
+        });
+        
+        // 테이블 업데이트
+        renderTableBody(investor.stockColumns, updatedStocks);
+        updateLastUpdatedTime();
+        
+        console.log('주식 데이터가 성공적으로 업데이트되었습니다.');
+    } catch (error) {
+        console.error('주식 데이터 업데이트 중 오류 발생:', error);
+        alert('주식 데이터를 가져오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+        // 새로고침 버튼 복원
+        setTimeout(() => {
+            refreshIcon.style.transform = 'rotate(0deg)';
+            refreshButton.disabled = false;
+        }, 500);
+    }
 }
 
 // 마지막 업데이트 시간 표시

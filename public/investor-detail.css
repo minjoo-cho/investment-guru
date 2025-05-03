@@ -1,0 +1,215 @@
+/* 투자 대가 상세 페이지 스타일 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* 투자자 프로필 헤더 */
+.investor-header {
+    background: linear-gradient(to right, #e6f7ff, #e6fff0);
+    padding: 3rem 0;
+}
+
+.investor-profile {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.investor-image {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.investor-info {
+    flex: 1;
+}
+
+.investor-info h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.investor-info .philosophy {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.investor-info .quote {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #666;
+    border-left: 4px solid #0066cc;
+    padding-left: 1rem;
+    margin: 1rem 0;
+}
+
+/* 투자 지표 섹션 */
+.investor-metrics {
+    padding: 3rem 0;
+    background-color: white;
+}
+
+.investor-metrics h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.metric-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+}
+
+.metric-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.metric-card p {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* 추천 종목 섹션 */
+.stock-recommendations {
+    padding: 3rem 0;
+    background-color: #f9f9f9;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h3 {
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.table-container {
+    overflow-x: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.stock-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.stock-table th, .stock-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.stock-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+    position: sticky;
+    top: 0;
+}
+
+.stock-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.stock-table .highlighted {
+    background-color: #e6f7ff;
+}
+
+.stock-table .up {
+    color: #4caf50;
+}
+
+.stock-table .down {
+    color: #f44336;
+}
+
+.score-cell {
+    font-weight: 600;
+}
+
+/* 투자 전략 섹션 */
+.investment-strategy {
+    padding: 3rem 0;
+    background-color: white;
+}
+
+.investment-strategy h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.strategy-content {
+    line-height: 1.7;
+}
+
+.strategy-content p {
+    margin-bottom: 1rem;
+}
+
+.strategy-content h4 {
+    font-size: 1.3rem;
+    margin: 1.5rem 0 0.8rem;
+    color: #333;
+}
+
+.strategy-content ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.strategy-content li {
+    margin-bottom: 0.5rem;
+}
+
+/* 미디어 쿼리 - 반응형 디자인 */
+@media (max-width: 768px) {
+    .investor-profile {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .investor-info .quote {
+        text-align: left;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .update-info {
+        width: 100%;
+    }
+}

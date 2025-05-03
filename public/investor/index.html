@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투자 대가 상세 정보 - 부자따라 부자되기</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../investor-detail.css">
+</head>
+<body>
+    <header>
+        <h1><a href="../index.html">부자따라 부자되기</a></h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">홈</a></li>
+                <li><a href="../goods.html">굿즈</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="investor-header">
+            <div class="container">
+                <div class="investor-profile">
+                    <img id="investor-image" src="" alt="투자 대가" class="investor-image">
+                    <div class="investor-info">
+                        <h2 id="investor-name"></h2>
+                        <p id="investor-philosophy" class="philosophy"></p>
+                        <blockquote id="investor-quote" class="quote"></blockquote>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="investor-metrics">
+            <div class="container">
+                <h3>주요 투자 지표</h3>
+                <div class="metrics-grid" id="metrics-grid">
+                    <!-- 투자 지표가 동적으로 추가됩니다 -->
+                </div>
+            </div>
+        </section>
+        
+        <section class="stock-recommendations">
+            <div class="container">
+                <div class="section-header">
+                    <h3>추천 종목 리스트</h3>
+                    <div class="update-info">
+                        <p>마지막 업데이트: <span id="last-updated"></span></p>
+                        <button id="refresh-button">
+                            <span class="refresh-icon">↻</span> 새로고침
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="stock-table">
+                        <thead id="table-head">
+                            <!-- 테이블 헤더는 동적으로 생성됩니다 -->
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- 테이블 내용은 동적으로 생성됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <section class="investment-strategy">
+            <div class="container">
+                <h3>투자 철학 및 전략</h3>
+                <div class="strategy-content" id="strategy-content">
+                    <!-- 투자 전략 내용이 동적으로 추가됩니다 -->
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 부자따라 부자되기. 모든 권리 보유.</p>
+    </footer>
+    
+    <script src="../investor-data.js"></script>
+    <script src="../investor-detail.js"></script>
+</body>
+</html>

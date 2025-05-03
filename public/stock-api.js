@@ -1,5 +1,5 @@
 // API 키는 실제 키로 대체해주세요
-const API_KEY = 'YOUR_API_KEY_HERE';
+let API_KEY = 'YOUR_API_KEY_HERE';
 
 // 주식 데이터 가져오기
 async function fetchStockData(symbol) {

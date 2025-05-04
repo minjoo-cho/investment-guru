@@ -5,7 +5,7 @@ const investorsData = {
         name: '워렌 버핏',
         philosophy: '기업의 본질적 가치에 집중하는 가치투자의 대가',
         quote: '다른 사람들이 두려워할 때 욕심내고, 다른 사람들이 욕심낼 때 두려워하라.',
-        image: 'images/warren-buffet.png',
+        image: 'public/images/warren-buffet.png',
         metrics: [
             {
                 name: 'ROE (자기자본이익률)',

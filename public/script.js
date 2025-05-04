@@ -5,7 +5,7 @@ const investors = [
         name: '워렌 버핏',
         philosophy: '기업의 본질적 가치에 집중하는 가치투자의 대가',
         quote: '다른 사람들이 두려워할 때 욕심내고, 다른 사람들이 욕심낼 때 두려워하라.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/warren-buffett.png',
         topStocks: [
             { symbol: 'AAPL', name: '애플', score: 95 },
             { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 92 },
@@ -17,7 +17,7 @@ const investors = [
         name: '피터 린치',
         philosophy: '일상에서 발견할 수 있는 성장 기업을 발굴하는 전략가',
         quote: '주식을 지금 사야 할지 고민 중이라면, 그건 안 사는 게 맞다.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/peter-lynch.png',
         topStocks: [
             { symbol: 'SBUX', name: '스타벅스', score: 94 },
             { symbol: 'COST', name: '코스트코', score: 91 },
@@ -29,7 +29,7 @@ const investors = [
         name: '벤자민 그레이엄',
         philosophy: '안전마진을 중시하는 가치투자의 창시자',
         quote: '투자는 철저한 분석, 약속된 안전성, 적절한 수익을 동반한다.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/benjamin-graham.png',
         topStocks: [
             { symbol: 'PG', name: '프록터앤갬블', score: 93 },
             { symbol: 'JNJ', name: '존슨앤존슨', score: 90 },
@@ -41,7 +41,7 @@ const investors = [
         name: '찰리 멍거',
         philosophy: '다학제적 사고모델을 바탕으로 한 가치투자의 실천가',
         quote: '당신이 무엇을 모르는지 아는 것이 중요하다.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/charlie-munger.png',
         topStocks: [
             { symbol: 'COST', name: '코스트코', score: 95 },
             { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 91 },
@@ -53,7 +53,7 @@ const investors = [
         name: '레이 달리오',
         philosophy: '경제 사이클과 자산 배분에 기반한 투자 전략가',
         quote: '고통 + 성찰 = 진보',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/ray-dalio.png',
         topStocks: [
             { symbol: 'GLD', name: 'SPDR 골드', score: 96 },
             { symbol: 'TLT', name: 'iShares 20+ 채권', score: 94 },
@@ -65,7 +65,7 @@ const investors = [
         name: '필립 피셔',
         philosophy: '성장 잠재력이 높은 기업을 발굴하는 성장주 투자의 대가',
         quote: '적절한 기업을 매수한 후에는 성급한 매도는 최악의 실수다.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/philip-fisher.png',
         topStocks: [
             { symbol: 'MSFT', name: '마이크로소프트', score: 97 },
             { symbol: 'TSLA', name: '테슬라', score: 93 },
@@ -77,7 +77,7 @@ const investors = [
         name: '존 보글',
         philosophy: '인덱스 투자와 낮은 비용의 장기 투자 옹호자',
         quote: '시간은 당신의 친구이며, 충동은 적이다.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/john-bogle.png',
         topStocks: [
             { symbol: 'VTI', name: '토탈 마켓 ETF', score: 95 },
             { symbol: 'VOO', name: 'S&P 500 ETF', score: 94 },
@@ -89,7 +89,7 @@ const investors = [
         name: '하워드 막스',
         philosophy: '시장 심리와 가치 평가에 집중하는 채권 투자의 거장',
         quote: '대부분의 사람들이 조심스러울 때는 공격적이어야 하고, 공격적일 때는 조심해야 한다.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/howard-marks.png',
         topStocks: [
             { symbol: 'AMZN', name: '아마존', score: 92 },
             { symbol: 'GOOGL', name: '알파벳', score: 90 },
@@ -101,7 +101,7 @@ const investors = [
         name: '짐 사이먼스',
         philosophy: '수학적 모델과 알고리즘을 활용한 퀀트 투자의 선구자',
         quote: '시장을 이기려면 더 많은 정보와 더 정확한 분석이 필요하다.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/jim-simons.png',
         topStocks: [
             { symbol: 'GOOGL', name: '알파벳', score: 98 },
             { symbol: 'AMZN', name: '아마존', score: 96 },
@@ -113,7 +113,7 @@ const investors = [
         name: '존 템플턴',
         philosophy: '글로벌 투자와 가치 기반 접근으로 유명한 국제 투자의 선구자',
         quote: '다른 사람들이 외면하는 곳에서 기회를 찾아라.',
-        image: 'https://via.placeholder.com/150',
+        image: '/images/john-templeton.png',
         topStocks: [
             { symbol: 'VXUS', name: '해외 주식 ETF', score: 96 },
             { symbol: 'VWO', name: '신흥국 ETF', score: 92 },

@@ -64,6 +64,24 @@ async function fetchStockData(symbol) {
     }
 }
 
+// 모의 데이터 생성
+function generateMockData(symbol) {
+    // 기준 가격 (실제 API 호출 실패 시 모의 데이터로 사용)
+    const basePrice = getBasePriceForSymbol(symbol);
+    const randomChange = (Math.random() * 4 - 2).toFixed(1);
+    const changeValue = parseFloat(randomChange);
+    const price = parseFloat((basePrice * (1 + changeValue / 100)).toFixed(2));
+    
+    return {
+        symbol: symbol,
+        price: price,
+        change: changeValue,
+        volume: Math.floor(Math.random() * 10000000) + 1000000,
+        previousClose: basePrice,
+        timestamp: new Date().toLocaleString(),
+        isMock: true
+    };
+}
 
 // 기본 가격 정보 (외부 API에서 가져오거나 DB에서 관리해야 하지만 현재는 예시로 사용)
 function getBasePriceForSymbol(symbol) {

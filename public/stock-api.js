@@ -65,6 +65,7 @@ async function fetchStockData(symbol) {
 }
 
 // 모의 데이터 생성
+// 모의 데이터 생성
 function generateMockData(symbol) {
     // 기준 가격 (실제 API 호출 실패 시 모의 데이터로 사용)
     const basePrice = getBasePriceForSymbol(symbol);
@@ -82,6 +83,7 @@ function generateMockData(symbol) {
         isMock: true
     };
 }
+
 
 // 기본 가격 정보 (외부 API에서 가져오거나 DB에서 관리해야 하지만 현재는 예시로 사용)
 function getBasePriceForSymbol(symbol) {

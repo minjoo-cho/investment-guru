@@ -1,104 +1,263 @@
-// 마지막 업데이트 시간을 저장하기 위한 전역 변수
-let lastPriceUpdate = null; 
-let lastMetricsUpdate = null;
+// 투자자 데이터 (샘플)
+const investors = [
+    {
+        id: 'warren-buffett',
+        name: '워렌 버핏',
+        philosophy: '기업의 본질적 가치에 집중하는 가치투자의 대가',
+        quote: '다른 사람들이 두려워할 때 욕심내고, 다른 사람들이 욕심낼 때 두려워하라.',
+        image: '/images/warren-buffett.png',
+        topStocks: [
+            { symbol: 'AAPL', name: '애플', score: 95 },
+            { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 92 },
+            { symbol: 'KO', name: '코카콜라', score: 88 }
+        ]
+    },
+    {
+        id: 'peter-lynch',
+        name: '피터 린치',
+        philosophy: '일상에서 발견할 수 있는 성장 기업을 발굴하는 전략가',
+        quote: '주식을 지금 사야 할지 고민 중이라면, 그건 안 사는 게 맞다.',
+        image: '/images/peter-lynch.png',
+        topStocks: [
+            { symbol: 'SBUX', name: '스타벅스', score: 94 },
+            { symbol: 'COST', name: '코스트코', score: 91 },
+            { symbol: 'TGT', name: '타겟', score: 87 }
+        ]
+    },
+    {
+        id: 'benjamin-graham',
+        name: '벤자민 그레이엄',
+        philosophy: '안전마진을 중시하는 가치투자의 창시자',
+        quote: '투자는 철저한 분석, 약속된 안전성, 적절한 수익을 동반한다.',
+        image: '/images/benjamin-graham.png',
+        topStocks: [
+            { symbol: 'PG', name: '프록터앤갬블', score: 93 },
+            { symbol: 'JNJ', name: '존슨앤존슨', score: 90 },
+            { symbol: 'JPM', name: 'JP모건', score: 88 }
+        ]
+    },
+    {
+        id: 'charlie-munger',
+        name: '찰리 멍거',
+        philosophy: '다학제적 사고모델을 바탕으로 한 가치투자의 실천가',
+        quote: '당신이 무엇을 모르는지 아는 것이 중요하다.',
+        image: '/images/charlie-munger.png',
+        topStocks: [
+            { symbol: 'COST', name: '코스트코', score: 95 },
+            { symbol: 'BRK-B', name: '버크셔 해서웨이', score: 91 },
+            { symbol: 'WFC', name: '웰스파고', score: 87 }
+        ]
+    },
+    {
+        id: 'ray-dalio',
+        name: '레이 달리오',
+        philosophy: '경제 사이클과 자산 배분에 기반한 투자 전략가',
+        quote: '고통 + 성찰 = 진보',
+        image: '/images/ray-dalio.png',
+        topStocks: [
+            { symbol: 'GLD', name: 'SPDR 골드', score: 96 },
+            { symbol: 'TLT', name: 'iShares 20+ 채권', score: 94 },
+            { symbol: 'VWO', name: '신흥국 ETF', score: 89 }
+        ]
+    },
+    {
+        id: 'phil-fisher',
+        name: '필립 피셔',
+        philosophy: '성장 잠재력이 높은 기업을 발굴하는 성장주 투자의 대가',
+        quote: '적절한 기업을 매수한 후에는 성급한 매도는 최악의 실수다.',
+        image: '/images/philip-fisher.png',
+        topStocks: [
+            { symbol: 'MSFT', name: '마이크로소프트', score: 97 },
+            { symbol: 'TSLA', name: '테슬라', score: 93 },
+            { symbol: 'NVDA', name: '엔비디아', score: 92 }
+        ]
+    },
+    {
+        id: 'john-bogle',
+        name: '존 보글',
+        philosophy: '인덱스 투자와 낮은 비용의 장기 투자 옹호자',
+        quote: '시간은 당신의 친구이며, 충동은 적이다.',
+        image: '/images/john-bogle.png',
+        topStocks: [
+            { symbol: 'VTI', name: '토탈 마켓 ETF', score: 95 },
+            { symbol: 'VOO', name: 'S&P 500 ETF', score: 94 },
+            { symbol: 'BND', name: '토탈 채권 ETF', score: 90 }
+        ]
+    },
+    {
+        id: 'howard-marks',
+        name: '하워드 막스',
+        philosophy: '시장 심리와 가치 평가에 집중하는 채권 투자의 거장',
+        quote: '대부분의 사람들이 조심스러울 때는 공격적이어야 하고, 공격적일 때는 조심해야 한다.',
+        image: '/images/howard-marks.png',
+        topStocks: [
+            { symbol: 'AMZN', name: '아마존', score: 92 },
+            { symbol: 'GOOGL', name: '알파벳', score: 90 },
+            { symbol: 'C', name: '시티그룹', score: 87 }
+        ]
+    },
+    {
+        id: 'jim-simons',
+        name: '짐 사이먼스',
+        philosophy: '수학적 모델과 알고리즘을 활용한 퀀트 투자의 선구자',
+        quote: '시장을 이기려면 더 많은 정보와 더 정확한 분석이 필요하다.',
+        image: '/images/jim-simons.png',
+        topStocks: [
+            { symbol: 'GOOGL', name: '알파벳', score: 98 },
+            { symbol: 'AMZN', name: '아마존', score: 96 },
+            { symbol: 'MSFT', name: '마이크로소프트', score: 95 }
+        ]
+    },
+    {
+        id: 'john-templeton',
+        name: '존 템플턴',
+        philosophy: '글로벌 투자와 가치 기반 접근으로 유명한 국제 투자의 선구자',
+        quote: '다른 사람들이 외면하는 곳에서 기회를 찾아라.',
+        image: '/images/john-templeton.png',
+        topStocks: [
+            { symbol: 'VXUS', name: '해외 주식 ETF', score: 96 },
+            { symbol: 'VWO', name: '신흥국 ETF', score: 92 },
+            { symbol: 'EWJ', name: '일본 ETF', score: 89 }
+        ]
+    }
+];
 
-// 업데이트 간격 설정 (밀리초 단위)
-const UPDATE_INTERVAL = {
-    PRICE: 3 * 60 * 60 * 1000,  // 3시간
-    METRICS: 24 * 60 * 60 * 1000 // 24시간
+// 주식 변화에 따른 화살표 컴포넌트
+const ChangeArrow = ({ change }) => {
+    if (change > 0) return '<span class="up">↑</span>';
+    if (change < 0) return '<span class="down">↓</span>';
+    return '';
 };
 
+// 대가 카드의 말풍선 컴포넌트
+function createStockBubble(stocks) {
+    let stockBubbleHTML = `<div class="stock-bubble">
+        <h4>추천 종목 Top 3</h4>
+        <ul>`;
+    
+    stocks.forEach(stock => {
+        const changeClass = stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
+        const changeSign = stock.change > 0 ? '+' : '';
+        const changeArrow = stock.change > 0 ? '↑' : stock.change < 0 ? '↓' : '';
+        
+        stockBubbleHTML += `
+            <li>
+                <div class="stock-details">
+                    <span>${stock.name}</span>
+                    <span class="symbol">${stock.symbol}</span>
+                </div>
+                <div>
+                    <span class="${changeClass}">${changeSign}${stock.change}% ${changeArrow}</span>
+                    <span class="price">$${stock.price ? stock.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '로딩중...'}</span>
+                </div>
+            </li>`;
+    });
+    
+    stockBubbleHTML += `</ul></div>`;
+    
+    return stockBubbleHTML;
+}
+
+// 투자자 카드 렌더링 함수
+function renderInvestorCards() {
+    const investorGrid = document.getElementById('investor-grid');
+    investorGrid.innerHTML = ''; // 기존 내용 삭제
+    
+    investors.forEach(investor => {
+        const card = document.createElement('div');
+        card.className = 'investor-card';
+        card.dataset.id = investor.id;
+        
+        // 주식 말풍선 HTML 생성
+        const stockBubbleHTML = createStockBubble(investor.topStocks);
+        
+        // 카드 내용 HTML 생성
+        card.innerHTML = `
+            ${stockBubbleHTML}
+            <img src="${investor.image}" alt="${investor.name}">
+            <h3>${investor.name}</h3>
+            <p>${investor.philosophy}</p>
+            <p class="quote">"${investor.quote}"</p>
+            <button>상세 보기 <span>→</span></button>
+        `;
+        
+        // 마우스 오버 이벤트 추가
+        card.addEventListener('mouseenter', function() {
+            const bubble = this.querySelector('.stock-bubble');
+            bubble.style.display = 'block';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            const bubble = this.querySelector('.stock-bubble');
+            bubble.style.display = 'none';
+        });
+        
+        // 상세 보기 버튼 클릭 이벤트
+        const button = card.querySelector('button');
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // 버블링 방지
+            window.location.href = `investor/index.html?id=${investor.id}`;
+        });
+        
+        investorGrid.appendChild(card);
+    });
+}
+
+// 모든 투자자의 모든 주식 심볼 가져오기
+function getAllStockSymbols() {
+    const symbols = new Set();
+    
+    investors.forEach(investor => {
+        investor.topStocks.forEach(stock => {
+            symbols.add(stock.symbol);
+        });
+    });
+    
+    return Array.from(symbols);
+}
+
 // 주식 데이터 업데이트 함수
-async function updateStockData(forceUpdate = false) {
+async function updateStockData() {
     const refreshButton = document.getElementById('refresh-button');
     const refreshIcon = refreshButton.querySelector('.refresh-icon');
     
-    // 업데이트 시작 시 시각적 피드백
     refreshIcon.style.transform = 'rotate(360deg)';
     refreshButton.disabled = true;
     
     try {
-        const now = new Date();
+        // 모든 주식 심볼 가져오기
+        const allSymbols = getAllStockSymbols();
         
         // API가 로드되었는지 확인
         if (!window.StockAPI) {
             throw new Error('Stock API가 로드되지 않았습니다.');
         }
         
-        // 주가 업데이트 필요 여부 확인
-        const needPriceUpdate = forceUpdate || 
-                               !lastPriceUpdate || 
-                               (now - lastPriceUpdate) > UPDATE_INTERVAL.PRICE;
+        // 모든 주식 데이터 가져오기
+        const stockData = await window.StockAPI.fetchMultipleStocks(allSymbols);
         
-        // 투자 지표 업데이트 필요 여부 확인
-        const needMetricsUpdate = forceUpdate || 
-                                 !lastMetricsUpdate || 
-                                 (now - lastMetricsUpdate) > UPDATE_INTERVAL.METRICS;
-        
-        // 업데이트가 필요한 경우에만 API 호출
-        if (needPriceUpdate || needMetricsUpdate) {
-            console.log(`데이터 업데이트 시작 - 주가: ${needPriceUpdate ? '예' : '아니오'}, 지표: ${needMetricsUpdate ? '예' : '아니오'}`);
-            
-            // 각 투자자별 맞춤형 종목 데이터 가져오기
-            const updatePromises = investors.map(async (investor) => {
-                try {
-                    // 투자자별 지표에 맞는 종목 가져오기 (파라미터로 업데이트 유형 전달)
-                    const stocks = await window.StockAPI.getStocksByInvestor(
-                        investor.id,
-                        needPriceUpdate,
-                        needMetricsUpdate
-                    );
-                    
-                    // 상위 3개 종목만 선택하여 투자자 데이터 업데이트
-                    investor.topStocks = stocks.slice(0, 3);
-                    
-                    return true;
-                } catch (error) {
-                    console.error(`${investor.name} 종목 데이터 가져오기 오류:`, error);
-                    return false;
+        // 각 투자자의 추천 종목 데이터 업데이트
+        investors.forEach(investor => {
+            investor.topStocks.forEach(stock => {
+                if (stockData[stock.symbol]) {
+                    stock.price = stockData[stock.symbol].price;
+                    stock.change = stockData[stock.symbol].change;
+                    stock.previousClose = stockData[stock.symbol].previousClose;
+                    stock.isMock = stockData[stock.symbol].isMock;
                 }
             });
-            
-            // 모든 업데이트 작업 완료 대기
-            const results = await Promise.all(updatePromises);
-            const allSuccessful = results.every(result => result === true);
-            
-            // 마지막 업데이트 시간 기록
-            if (needPriceUpdate) {
-                lastPriceUpdate = now;
-                const nextPriceUpdate = new Date(now.getTime() + UPDATE_INTERVAL.PRICE);
-                console.log(`주가 데이터가 업데이트되었습니다. 다음 업데이트: ${nextPriceUpdate.toLocaleTimeString()}`);
-            }
-            
-            if (needMetricsUpdate) {
-                lastMetricsUpdate = now;
-                const nextMetricsUpdate = new Date(now.getTime() + UPDATE_INTERVAL.METRICS);
-                console.log(`투자 지표가 업데이트되었습니다. 다음 업데이트: ${nextMetricsUpdate.toLocaleTimeString()}`);
-            }
-            
-            // UI 업데이트
-            renderInvestorCards();
-            updateLastUpdatedTime();
-            
-            console.log(`주식 데이터 업데이트 완료. ${allSuccessful ? '모든 업데이트 성공' : '일부 업데이트 실패'}`);
-        } else {
-            console.log('최근에 업데이트되어 새로운 데이터를 가져오지 않았습니다.');
-            
-            if (lastPriceUpdate) {
-                const nextPriceUpdate = new Date(lastPriceUpdate.getTime() + UPDATE_INTERVAL.PRICE);
-                console.log(`다음 주가 업데이트: ${nextPriceUpdate.toLocaleTimeString()}`);
-            }
-            
-            if (lastMetricsUpdate) {
-                const nextMetricsUpdate = new Date(lastMetricsUpdate.getTime() + UPDATE_INTERVAL.METRICS);
-                console.log(`다음 지표 업데이트: ${nextMetricsUpdate.toLocaleTimeString()}`);
-            }
-        }
+        });
+        
+        // UI 업데이트
+        renderInvestorCards();
+        updateLastUpdatedTime();
+        
+        console.log('주식 데이터가 성공적으로 업데이트되었습니다.');
     } catch (error) {
         console.error('주식 데이터 업데이트 중 오류 발생:', error);
         alert('주식 데이터를 가져오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
-        // 새로고침 버튼 복원
+        // 리프레시 버튼 복원
         setTimeout(() => {
             refreshIcon.style.transform = 'rotate(0deg)';
             refreshButton.disabled = false;
@@ -106,27 +265,11 @@ async function updateStockData(forceUpdate = false) {
     }
 }
 
-// 마지막 업데이트 시간 표시 (주가, 지표 업데이트 시간 모두 표시)
+// 마지막 업데이트 시간 표시
 function updateLastUpdatedTime() {
     const now = new Date();
-    const options = { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-    };
-    
-    let timeText = `마지막 UI 업데이트: ${now.toLocaleTimeString(undefined, options)}`;
-    
-    if (lastPriceUpdate) {
-        timeText += ` | 주가: ${lastPriceUpdate.toLocaleTimeString(undefined, options)}`;
-    }
-    
-    if (lastMetricsUpdate) {
-        timeText += ` | 지표: ${lastMetricsUpdate.toLocaleTimeString(undefined, options)}`;
-    }
-    
-    document.getElementById('last-updated').textContent = timeText;
+    const formattedTime = now.toLocaleTimeString();
+    document.getElementById('last-updated').textContent = formattedTime;
 }
 
 // 페이지 로드 시 실행
@@ -143,17 +286,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 새로고침 버튼 이벤트
-    document.getElementById('refresh-button').addEventListener('click', () => {
-        updateStockData(true); // 강제 업데이트
-    });
+    document.getElementById('refresh-button').addEventListener('click', updateStockData);
     
     // 페이지 로드 후 데이터 가져오기
     setTimeout(() => {
         updateStockData();
     }, 1000);
     
-    // 5분마다 자동 업데이트 확인
-    setInterval(() => {
-        updateStockData(false); // 필요할 때만 업데이트
-    }, 5 * 60 * 1000);
+    // 5분마다 자동 업데이트
+    setInterval(updateStockData, 5 * 60 * 1000);
 });

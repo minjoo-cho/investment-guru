@@ -69,7 +69,15 @@ function getBasePriceForSymbol(symbol) {
         'VWO': 43.81, 'MSFT': 417.82, 'TSLA': 179.23,
         'NVDA': 924.73, 'VTI': 253.82, 'VOO': 469.81,
         'BND': 74.53, 'VXUS': 60.24, 'AMZN': 183.26,
-        'GOOGL': 174.49, 'C': 63.81, 'EWJ': 48.52
+        'GOOGL': 174.49, 'C': 63.81, 'EWJ': 48.52,
+        'MCO': 415.27, 'AXP': 235.26, 'BAC': 39.69, 
+        'DVA': 139.55, 'VZ': 40.89, 'CVX': 153.18, 
+        'KHC': 36.98, 'CE': 142.61, 'GM': 45.70, 
+        'OXY': 59.75, 'PARA': 12.00, 'HPQ': 34.85, 
+        'NUE': 178.46, 'SNOW': 180.76, 'USB': 42.16,
+        'LULU': 301.75, 'CMG': 2841.67, 'DPZ': 417.79, 
+        'DG': 150.30, 'ULTA': 458.90, 'TJX': 103.51,
+        'ETSY': 68.16, 'DIS': 112.61, 'YUM': 132.43
     };
     
     return priceMap[symbol] || 100.00; // 기본값 100.00
@@ -89,6 +97,264 @@ async function fetchMultipleStocks(symbols) {
     }, {});
 }
 
+// 워렌 버핏 지표에 따른 종목 평가
+async function evaluateBuffettStocks() {
+    // 워렌 버핏이 선호하는 종목 후보들
+    const candidates = ['AAPL', 'BRK-B', 'KO', 'AMZN', 'MCO', 'AXP', 'BAC', 'DVA', 'VZ', 'CVX', 'KHC', 'CE', 'GM', 'PG', 'OXY', 'PARA', 'HPQ', 'NUE', 'SNOW', 'USB'];
+    
+    // 종목 데이터 가져오기
+    const stocksData = await fetchMultipleStocks(candidates);
+    
+    // 종목 평가 및 점수 계산
+    const evaluatedStocks = candidates.map(symbol => {
+        const stockData = stocksData[symbol];
+        const score = calculateBuffettScore(symbol, stockData);
+        
+        return {
+            symbol: symbol,
+            name: getStockName(symbol),
+            price: stockData.price,
+            change: stockData.change,
+            score: score
+        };
+    });
+    
+    // 점수가 높은 순으로 정렬
+    return evaluatedStocks.sort((a, b) => b.score - a.score);
+}
+
+// 찰리 멍거 지표에 따른 종목 평가
+async function evaluateMungerStocks() {
+    // 찰리 멍거가 선호하는 종목 후보들
+    const candidates = ['COST', 'BRK-B', 'WFC', 'AAPL', 'BAC', 'USB', 'MSFT', 'GOOGL', 'JNJ', 'PG'];
+    
+    // 종목 데이터 가져오기
+    const stocksData = await fetchMultipleStocks(candidates);
+    
+    // 종목 평가 및 점수 계산
+    const evaluatedStocks = candidates.map(symbol => {
+        const stockData = stocksData[symbol];
+        const score = calculateMungerScore(symbol, stockData);
+        
+        return {
+            symbol: symbol,
+            name: getStockName(symbol),
+            price: stockData.price,
+            change: stockData.change,
+            score: score
+        };
+    });
+    
+    // 점수가 높은 순으로 정렬
+    return evaluatedStocks.sort((a, b) => b.score - a.score);
+}
+
+// 벤자민 그레이엄 지표에 따른 종목 평가
+async function evaluateGrahamStocks() {
+    // 벤자민 그레이엄이 선호하는 종목 후보들
+    const candidates = ['PG', 'JNJ', 'JPM', 'VZ', 'IBM', 'KMB', 'CVX', 'XOM', 'KO', 'PEP', 'MRK', 'PFE', 'CSCO', 'MCD', 'INTC', 'HD', 'MMM', 'CAT', 'WMT', 'TRV'];
+    
+    // 종목 데이터 가져오기
+    const stocksData = await fetchMultipleStocks(candidates);
+    
+    // 종목 평가 및 점수 계산
+    const evaluatedStocks = candidates.map(symbol => {
+        const stockData = stocksData[symbol];
+        const score = calculateGrahamScore(symbol, stockData);
+        
+        return {
+            symbol: symbol,
+            name: getStockName(symbol),
+            price: stockData.price,
+            change: stockData.change,
+            score: score
+        };
+    });
+    
+    // 점수가 높은 순으로 정렬
+    return evaluatedStocks.sort((a, b) => b.score - a.score);
+}
+
+// 피터 린치 지표에 따른 종목 평가
+async function evaluateLynchStocks() {
+    // 피터 린치가 선호하는 종목 후보들
+    const candidates = ['SBUX', 'COST', 'TGT', 'LULU', 'CMG', 'DPZ', 'DG', 'ULTA', 'TJX', 'ETSY', 'DIS', 'YUM', 'EL', 'NKE', 'BURL', 'BBY', 'WSM', 'DKS', 'GPS', 'KSS'];
+    
+    // 종목 데이터 가져오기
+    const stocksData = await fetchMultipleStocks(candidates);
+    
+    // 종목 평가 및 점수 계산
+    const evaluatedStocks = candidates.map(symbol => {
+        const stockData = stocksData[symbol];
+        const score = calculateLynchScore(symbol, stockData);
+        
+        return {
+            symbol: symbol,
+            name: getStockName(symbol),
+            price: stockData.price,
+            change: stockData.change,
+            score: score
+        };
+    });
+    
+    // 점수가 높은 순으로 정렬
+    return evaluatedStocks.sort((a, b) => b.score - a.score);
+}
+
+// 레이 달리오 지표에 따른 종목 평가
+async function evaluateDalioStocks() {
+    // 레이 달리오가 선호하는 종목 후보들
+    const candidates = ['GLD', 'TLT', 'VWO', 'SPY', 'IEF', 'EFA', 'LQD', 'VTIP', 'VNQ', 'BNDX', 'HYG', 'EMB'];
+    
+    // 종목 데이터 가져오기
+    const stocksData = await fetchMultipleStocks(candidates);
+    
+    // 종목 평가 및 점수 계산
+    const evaluatedStocks = candidates.map(symbol => {
+        const stockData = stocksData[symbol];
+        const score = calculateDalioScore(symbol, stockData);
+        
+        return {
+            symbol: symbol,
+            name: getStockName(symbol),
+            price: stockData.price,
+            change: stockData.change,
+            score: score
+        };
+    });
+    
+    // 점수가 높은 순으로 정렬
+    return evaluatedStocks.sort((a, b) => b.score - a.score);
+}
+
+// 투자자 ID에 따라 종목 평가 함수 선택
+async function getStocksByInvestor(investorId) {
+    switch (investorId) {
+        case 'warren-buffett':
+            return await evaluateBuffettStocks();
+        case 'charlie-munger':
+            return await evaluateMungerStocks();
+        case 'benjamin-graham':
+            return await evaluateGrahamStocks();
+        case 'peter-lynch':
+            return await evaluateLynchStocks();
+        case 'ray-dalio':
+            return await evaluateDalioStocks();
+        case 'george-soros':
+            // 소로스 평가 함수는 별도 구현 필요
+            return await evaluateBuffettStocks(); // 임시로 버핏 함수 사용
+        case 'jim-simons':
+            // 사이먼스 평가 함수는 별도 구현 필요
+            return await evaluateBuffettStocks(); // 임시로 버핏 함수 사용
+        case 'john-templeton':
+            // 템플턴 평가 함수는 별도 구현 필요
+            return await evaluateBuffettStocks(); // 임시로 버핏 함수 사용
+        case 'philip-fisher':
+            // 피셔 평가 함수는 별도 구현 필요
+            return await evaluateLynchStocks(); // 임시로 린치 함수 사용
+        case 'john-bogle':
+            // 보글 평가 함수는 별도 구현 필요
+            return await evaluateDalioStocks(); // 임시로 달리오 함수 사용
+        default:
+            return await evaluateBuffettStocks();
+    }
+}
+
+// 종목 이름 가져오기
+function getStockName(symbol) {
+    const stockNames = {
+        'AAPL': '애플', 'MSFT': '마이크로소프트', 'GOOGL': '알파벳', 'AMZN': '아마존',
+        'BRK-B': '버크셔 해서웨이', 'JPM': 'JP모건', 'JNJ': '존슨앤존슨', 'KO': '코카콜라',
+        'PG': '프록터앤갬블', 'VZ': '버라이즌', 'WFC': '웰스파고', 'COST': '코스트코',
+        'BAC': '뱅크 오브 아메리카', 'DVA': '다비타', 'CVX': '셰브론', 'KHC': '크래프트 하인즈',
+        'CE': '셀라니즈', 'GM': '제너럴 모터스', 'OXY': '옥시덴탈 페트롤리엄', 'PARA': '파라마운트',
+        'HPQ': 'HP Inc.', 'NUE': '뉴코', 'SNOW': '스노우플레이크', 'USB': 'US 뱅코프',
+        'MCO': '무디스', 'AXP': '아메리칸 익스프레스', 'IBM': 'IBM', 'KMB': '킴벌리-클락',
+        'XOM': '엑손모빌', 'PEP': '펩시코', 'MRK': '머크', 'PFE': '화이자',
+        'CSCO': '시스코', 'MCD': '맥도날드', 'INTC': '인텔', 'HD': '홈 디포',
+        'MMM': '3M', 'CAT': '캐터필러', 'WMT': '월마트', 'TRV': '트레블러스',
+        'SBUX': '스타벅스', 'TGT': '타겟', 'LULU': '룰루레몬', 'CMG': '치포틀레',
+        'DPZ': '도미노피자', 'DG': '달러 제너럴', 'ULTA': '울타 뷰티', 'TJX': 'TJX 컴퍼니스',
+        'ETSY': '엣시', 'DIS': '디즈니', 'YUM': '얌! 브랜즈', 'EL': '에스티 로더',
+        'NKE': '나이키', 'BURL': '벌링턴 스토어', 'BBY': '베스트 바이', 'WSM': '윌리엄스 소노마',
+        'DKS': '딕스 스포팅 굿즈', 'GPS': '갭', 'KSS': '콜스',
+        'GLD': 'SPDR 골드', 'TLT': 'iShares 20+ 채권', 'VWO': '신흥국 ETF',
+        'SPY': 'S&P 500 ETF', 'IEF': 'iShares 7-10년 채권', 'EFA': '선진국 ETF',
+        'LQD': '기업 채권 ETF', 'VTIP': '인플레이션 연동 ETF', 'VNQ': '리츠 ETF',
+        'BNDX': '국제 채권 ETF', 'HYG': '하이일드 채권 ETF', 'EMB': '신흥국 채권 ETF',
+        'VXUS': '해외 주식 ETF', 'EWJ': '일본 ETF', 'VTI': '토탈 마켓 ETF',
+        'VOO': 'S&P 500 ETF', 'BND': '토탈 채권 ETF'
+    };
+    
+    return stockNames[symbol] || symbol;
+}
+
+// 워렌 버핏 지표 점수 계산
+function calculateBuffettScore(symbol, stockData) {
+    // 미리 정의된 점수 (실제로는 API에서 재무제표 등을 가져와 계산해야 함)
+    const presetScores = {
+        'AAPL': 95, 'BRK-B': 92, 'KO': 88, 'AMZN': 86, 
+        'MCO': 85, 'AXP': 84, 'BAC': 82, 'DVA': 79,
+        'VZ': 78, 'CVX': 77, 'KHC': 76, 'CE': 75,
+        'GM': 74, 'PG': 73, 'OXY': 73, 'PARA': 72,
+        'HPQ': 72, 'NUE': 71, 'SNOW': 70, 'USB': 69
+    };
+    
+    return presetScores[symbol] || Math.floor(Math.random() * 20) + 60; // 기본값 60-80
+}
+
+// 찰리 멍거 지표 점수 계산
+function calculateMungerScore(symbol, stockData) {
+    // 미리 정의된 점수 (실제로는 API에서 재무제표 등을 가져와 계산해야 함)
+    const presetScores = {
+        'COST': 95, 'BRK-B': 91, 'WFC': 87, 'AAPL': 90,
+        'BAC': 85, 'USB': 83, 'MSFT': 88, 'GOOGL': 86,
+        'JNJ': 82, 'PG': 80
+    };
+    
+    return presetScores[symbol] || Math.floor(Math.random() * 20) + 60; // 기본값 60-80
+}
+
+// 벤자민 그레이엄 지표 점수 계산
+function calculateGrahamScore(symbol, stockData) {
+    // 미리 정의된 점수 (실제로는 API에서 재무제표 등을 가져와 계산해야 함)
+    const presetScores = {
+        'PG': 93, 'JNJ': 90, 'JPM': 88, 'VZ': 87,
+        'IBM': 86, 'KMB': 84, 'CVX': 83, 'XOM': 82,
+        'KO': 81, 'PEP': 80, 'MRK': 79, 'PFE': 77,
+        'CSCO': 76, 'MCD': 75, 'INTC': 74, 'HD': 73,
+        'MMM': 72, 'CAT': 71, 'WMT': 70, 'TRV': 69
+    };
+    
+    return presetScores[symbol] || Math.floor(Math.random() * 20) + 60; // 기본값 60-80
+}
+
+// 피터 린치 지표 점수 계산
+function calculateLynchScore(symbol, stockData) {
+    // 미리 정의된 점수 (실제로는 API에서 재무제표 등을 가져와 계산해야 함)
+    const presetScores = {
+        'SBUX': 94, 'COST': 91, 'TGT': 87, 'LULU': 86,
+        'CMG': 85, 'DPZ': 84, 'DG': 83, 'ULTA': 82,
+        'TJX': 81, 'ETSY': 80, 'DIS': 78, 'YUM': 77,
+        'EL': 76, 'NKE': 75, 'BURL': 74, 'BBY': 73,
+        'WSM': 72, 'DKS': 71, 'GPS': 70, 'KSS': 68
+    };
+    
+    return presetScores[symbol] || Math.floor(Math.random() * 20) + 60; // 기본값 60-80
+}
+
+// 레이 달리오 지표 점수 계산
+function calculateDalioScore(symbol, stockData) {
+    // 미리 정의된 점수 (실제로는 API에서 재무제표 등을 가져와 계산해야 함)
+    const presetScores = {
+        'GLD': 96, 'TLT': 94, 'VWO': 89, 'SPY': 88,
+        'IEF': 86, 'EFA': 85, 'LQD': 83, 'VTIP': 82,
+        'VNQ': 80, 'BNDX': 79, 'HYG': 77, 'EMB': 76
+    };
+    
+    return presetScores[symbol] || Math.floor(Math.random() * 20) + 60; // 기본값 60-80
+}
+
 // API 키 설정 함수
 function setApiKey(key) {
     API_KEY = key;
@@ -98,5 +364,6 @@ function setApiKey(key) {
 window.StockAPI = {
     fetchStockData,
     fetchMultipleStocks,
-    setApiKey
+    setApiKey,
+    getStocksByInvestor
 };

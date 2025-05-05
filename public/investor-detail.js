@@ -4,6 +4,23 @@ function getInvestorIdFromUrl() {
     return urlParams.get('id') || 'warren-buffett';
 }
 
+// 로컬스토리지에서 이전 데이터 불러오기
+function getCachedStocks(investorId) {
+    try {
+        const key = `stocks_${investorId}`;
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch { return null; }
+}
+
+// 로컬스토리지에 데이터 저장
+function setCachedStocks(investorId, stocks) {
+    try {
+        const key = `stocks_${investorId}`;
+        localStorage.setItem(key, JSON.stringify(stocks));
+    } catch {}
+}
+
 // 페이지 초기화
 async function initializeInvestorPage() {
     const investorId = getInvestorIdFromUrl();
@@ -26,7 +43,7 @@ async function initializeInvestorPage() {
     document.getElementById('strategy-content').innerHTML = investor.strategy;
 
     if (window.StockAPI) {
-        window.StockAPI.setApiKey('YOUR_API_KEY_HERE'); // 실제 API 키로 변경
+        window.StockAPI.setApiKey('YOUR_API_KEY_HERE'); // 실제 API 키로 교체
     }
 
     updateLastUpdatedTime();
@@ -38,12 +55,21 @@ async function initializeInvestorPage() {
         });
     }
 
+    // 1. 캐시/목 데이터라도 먼저 보여주기
+    const cached = getCachedStocks(investorId);
+    if (cached && cached.length > 0) {
+        renderStockTable(investor.stockColumns, cached, true);
+        showInfoMessage("이전 데이터 기준으로 표시 중입니다. 최신 데이터 로딩 중...");
+    }
+
+    // 2. 최신 데이터 시도
     try {
         const loadingElement = document.getElementById('loading');
         if (loadingElement) loadingElement.style.display = 'block';
 
         const stocks = await window.InvestorData.getInvestorStocksData(investorId);
-        renderStockTable(investor.stockColumns, stocks);
+        renderStockTable(investor.stockColumns, stocks, false);
+        setCachedStocks(investorId, stocks);
 
         if (loadingElement) loadingElement.style.display = 'none';
     } catch (error) {
@@ -54,9 +80,37 @@ async function initializeInvestorPage() {
     }
 }
 
-// 프로필/상세/배경/지표 렌더링 함수(생략, 기존과 동일)
+// 안내 메시지 표시
+function showInfoMessage(msg) {
+    let infoDiv = document.getElementById('info-message');
+    if (!infoDiv) {
+        infoDiv = document.createElement('div');
+        infoDiv.id = 'info-message';
+        infoDiv.style.color = '#888';
+        infoDiv.style.fontSize = '13px';
+        infoDiv.style.margin = '8px 0';
+        const target = document.getElementById('stock-table-section') || document.body;
+        target.insertBefore(infoDiv, target.firstChild);
+    }
+    infoDiv.textContent = msg;
+}
 
-function renderStockTable(columns, stocks) {
+// 오류 메시지 표시
+function showErrorMessage(msg) {
+    let errorDiv = document.getElementById('error-message');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.id = 'error-message';
+        errorDiv.style.color = '#d9534f';
+        errorDiv.style.fontSize = '14px';
+        errorDiv.style.margin = '10px 0';
+        const target = document.getElementById('stock-table-section') || document.body;
+        target.insertBefore(errorDiv, target.firstChild);
+    }
+    errorDiv.textContent = msg;
+}
+
+function renderStockTable(columns, stocks, isCached = false) {
     const tableHead = document.getElementById('table-head');
     if (!tableHead) return;
     tableHead.innerHTML = '';
@@ -77,10 +131,10 @@ function renderStockTable(columns, stocks) {
 
     tableHead.appendChild(headerRow);
 
-    renderTableBody(columns, stocks);
+    renderTableBody(columns, stocks, isCached);
 }
 
-function renderTableBody(columns, stocks) {
+function renderTableBody(columns, stocks, isCached = false) {
     const tableBody = document.getElementById('table-body');
     if (!tableBody) return;
     tableBody.innerHTML = '';

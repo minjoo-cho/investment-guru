@@ -1,5 +1,5 @@
 // API 키 설정 - 반드시 실제 키로 교체하세요
-let API_KEY = 'YOUR_API_KEY_HERE';
+let API_KEY = 'E4NLDLXWIPTGW9QY';
 
 // 캐시 시스템
 const dataCache = {

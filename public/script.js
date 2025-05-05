@@ -8,6 +8,7 @@ function renderInvestorMetrics() {
     // 메인 페이지에서는 별도 표시 없음 - 상세 페이지에서만 사용
 }
 
+renderInvestorMetrics();
 // 주식 말풍선 HTML 생성 함수
 function createStockBubble(stocks) {
     let bubbleHTML = `<div class="stock-bubble"><h4>추천 종목 Top 3</h4><ul>`;

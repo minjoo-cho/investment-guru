@@ -1,4 +1,36 @@
-// 투자자 카드 렌더링 함수 (수정)
+// 투자자 데이터와 종목 데이터 저장 변수
+let investors = [];
+let lastUpdated = new Date();
+
+// 투자자 지표 렌더링 함수 (추가됨)
+function renderInvestorMetrics() {
+    console.log("투자자 지표 렌더링 완료");
+    // 메인 페이지에서는 별도 표시 없음 - 상세 페이지에서만 사용
+}
+
+// 주식 말풍선 HTML 생성 함수
+function createStockBubble(stocks) {
+    let bubbleHTML = `<div class="stock-bubble"><h4>추천 종목 Top 3</h4><ul>`;
+    
+    stocks.forEach(stock => {
+        const changeClass = stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
+        const changeSymbol = stock.change > 0 ? '+' : '';
+        
+        bubbleHTML += `
+            <li>
+                <div class="stock-name">${stock.symbol}: ${stock.name}</div>
+                <div class="stock-price">$${stock.price.toFixed(2)} 
+                    <span class="${changeClass}">${changeSymbol}${stock.change}%</span>
+                </div>
+            </li>
+        `;
+    });
+    
+    bubbleHTML += `</ul></div>`;
+    return bubbleHTML;
+}
+
+// 투자자 카드 렌더링 함수
 function renderInvestorCards() {
     const investorGrid = document.getElementById('investor-grid');
     
@@ -67,6 +99,51 @@ function renderInvestorCards() {
     });
 }
 
+// 마지막 업데이트 시간 표시 함수
+function updateLastUpdatedTime() {
+    const lastUpdatedElement = document.getElementById('last-updated');
+    if (lastUpdatedElement) {
+        const now = new Date();
+        lastUpdated = now;
+        lastUpdatedElement.textContent = now.toLocaleTimeString();
+    }
+}
+
+// 주식 데이터 업데이트 함수
+async function updateStockData(forceUpdate = false) {
+    try {
+        // 마지막 업데이트 확인
+        const now = new Date();
+        if (!forceUpdate && (now - lastUpdated < 5 * 60 * 1000)) {
+            console.log('최근 5분 내 이미 업데이트됨, 스킵합니다.');
+            return;
+        }
+        
+        // 투자자 목록 가져오기
+        if (!investors || investors.length === 0) {
+            investors = window.InvestorData.getInvestorsForMainPage();
+        }
+        
+        // 각 투자자별 주식 데이터 업데이트
+        await Promise.all(investors.map(async (investor) => {
+            try {
+                investor.topStocks = await window.StockAPI.getStocksByInvestor(investor.id);
+                investor.topStocks = investor.topStocks.slice(0, 3); // 상위 3개만
+            } catch (error) {
+                console.error(`${investor.name} 주식 데이터 업데이트 오류:`, error);
+                investor.topStocks = []; // 오류 시 빈 배열
+            }
+        }));
+        
+        // UI 업데이트
+        renderInvestorCards();
+        updateLastUpdatedTime();
+        
+    } catch (error) {
+        console.error('주식 데이터 업데이트 중 오류 발생:', error);
+    }
+}
+
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -75,21 +152,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('InvestorData API가 로드되지 않았습니다.');
         }
         
-        // 투자자 기본 정보 가져오기 - 이 부분이 중요합니다!
+        // 투자자 기본 정보 가져오기
         investors = window.InvestorData.getInvestorsForMainPage();
         
         // 초기 카드 렌더링 - 기본 정보만 먼저 표시
         renderInvestorCards();
         
-        // 투자자 지표 렌더링
-        renderInvestorMetrics();
-        
         // 초기 시간 설정
         updateLastUpdatedTime();
         
-        // API 키 설정 (실제 API 키로 변경 필요)
-        if (window.StockAPI) {
-            window.StockAPI.setApiKey('YOUR_API_KEY_HERE');
+        // API 키 설정 - 실제 API 키로 변경
+        if (window.StockAPI && window.StockAPI.setApiKey) {
+            window.StockAPI.setApiKey('alphavantage_api_key_here');
         }
         
         // 새로고침 버튼 이벤트

@@ -2,33 +2,69 @@
 let investors = [];
 let lastUpdated = new Date();
 
-// 투자자 지표 렌더링 함수 (추가됨)
+// 투자자 지표 렌더링 함수
 function renderInvestorMetrics() {
     console.log("투자자 지표 렌더링 완료");
-    // 메인 페이지에서는 별도 표시 없음 - 상세 페이지에서만 사용
 }
 
-renderInvestorMetrics();
+// 초기 목 데이터 생성 (API 실패/지연 시 즉시 표시용)
+function generateInitialMockStocks(symbol, name) {
+    return {
+        symbol: symbol || 'AAPL',
+        name: name || 'Apple Inc.',
+        price: 100 + Math.random() * 900,
+        change: (Math.random() * 10 - 5).toFixed(2),
+        roe: (Math.random() * 30).toFixed(1),
+        debtToEquity: (Math.random() * 2).toFixed(2),
+        pe: (Math.random() * 40 + 5).toFixed(1),
+        score: Math.floor(Math.random() * 40 + 60),
+        lastUpdated: new Date(),
+        isMock: true
+    };
+}
+
 // 주식 말풍선 HTML 생성 함수
 function createStockBubble(stocks) {
     let bubbleHTML = `<div class="stock-bubble"><h4>추천 종목 Top 3</h4><ul>`;
     
-    stocks.forEach(stock => {
-        const changeClass = stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
-        const changeSymbol = stock.change > 0 ? '+' : '';
-        
-        bubbleHTML += `
-            <li>
-                <div class="stock-name">${stock.symbol}: ${stock.name}</div>
-                <div class="stock-price">$${stock.price.toFixed(2)} 
-                    <span class="${changeClass}">${changeSymbol}${stock.change}%</span>
-                </div>
-            </li>
-        `;
-    });
+    if (!stocks || stocks.length === 0) {
+        bubbleHTML += `<li><div class="stock-name">데이터 로드 중...</div></li>`;
+    } else {
+        stocks.forEach(stock => {
+            const changeClass = stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
+            const changeSymbol = stock.change > 0 ? '+' : '';
+            
+            bubbleHTML += `
+                <li>
+                    <div class="stock-name">${stock.symbol}: ${stock.name}</div>
+                    <div class="stock-price">$${stock.price.toFixed(2)} 
+                        <span class="${changeClass}">${changeSymbol}${stock.change}%</span>
+                        ${stock.isMock ? '<small style="color:#d9534f;">[목]</small>' : ''}
+                    </div>
+                </li>
+            `;
+        });
+    }
     
     bubbleHTML += `</ul></div>`;
     return bubbleHTML;
+}
+
+// 캐시에서 이전 데이터 불러오기
+function getCachedStocks(investorId) {
+    try {
+        const key = `stocks_${investorId}`;
+        const data = sessionStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch { return null; }
+}
+
+// 캐시에 데이터 저장
+function setCachedStocks(investorId, stocks) {
+    try {
+        const key = `stocks_${investorId}`;
+        sessionStorage.setItem(key, JSON.stringify(stocks));
+    } catch {}
 }
 
 // 투자자 카드 렌더링 함수
@@ -54,25 +90,35 @@ function renderInvestorCards() {
     
     // 각 투자자 카드 생성
     investors.forEach(investor => {
+        // undefined 체크 및 기본값 설정
+        if (!investor || typeof investor !== 'object') {
+            console.error('유효하지 않은 투자자 데이터:', investor);
+            return;
+        }
+        
         const card = document.createElement('div');
         card.className = 'investor-card';
-        card.dataset.id = investor.id;
+        card.dataset.id = investor.id || '';
         
-        // 주식 말풍선 HTML 생성 (투자자 데이터가 있을 때)
-        const stockBubbleHTML = investor.topStocks && investor.topStocks.length > 0 ? 
-            createStockBubble(investor.topStocks) : 
-            `<div class="stock-bubble">
-                <h4>추천 종목 Top 3</h4>
-                <p class="loading-text">데이터를 불러오는 중입니다...</p>
-            </div>`;
+        // 목 데이터가 없으면 기본 목 데이터 생성
+        if (!investor.topStocks || investor.topStocks.length === 0) {
+            investor.topStocks = [
+                generateInitialMockStocks('AAPL', 'Apple Inc.'),
+                generateInitialMockStocks('MSFT', 'Microsoft Corp'),
+                generateInitialMockStocks('GOOGL', 'Alphabet Inc')
+            ];
+        }
         
-        // 카드 내용 HTML 생성
+        // 주식 말풍선 HTML 생성
+        const stockBubbleHTML = createStockBubble(investor.topStocks);
+        
+        // 카드 내용 HTML 생성 (필드가 없는 경우 기본값 사용)
         card.innerHTML = `
             ${stockBubbleHTML}
-            <img src="${investor.image}" alt="${investor.name}" loading="lazy">
-            <h3>${investor.name}</h3>
-            <p>${investor.philosophy}</p>
-            <p class="quote">"${investor.quote}"</p>
+            <img src="${investor.image || '/images/default-investor.png'}" alt="${investor.name || '투자자'}" loading="lazy">
+            <h3>${investor.name || '투자자'}</h3>
+            <p>${investor.philosophy || '투자 철학 정보가 없습니다.'}</p>
+            <p class="quote">"${investor.quote || '인용구 정보가 없습니다.'}"</p>
             <button>상세 보기 <span>→</span></button>
         `;
         
@@ -92,7 +138,7 @@ function renderInvestorCards() {
         if (button) {
             button.addEventListener('click', function(e) {
                 e.stopPropagation(); // 버블링 방지
-                window.location.href = `investor/?id=${investor.id}`;
+                window.location.href = `investor/?id=${investor.id || ''}`;
             });
         }
         
@@ -125,19 +171,45 @@ async function updateStockData(forceUpdate = false) {
             investors = window.InvestorData.getInvestorsForMainPage();
         }
         
-        // 각 투자자별 주식 데이터 업데이트
-        await Promise.all(investors.map(async (investor) => {
-            try {
-                investor.topStocks = await window.StockAPI.getStocksByInvestor(investor.id);
-                investor.topStocks = investor.topStocks.slice(0, 3); // 상위 3개만
-            } catch (error) {
-                console.error(`${investor.name} 주식 데이터 업데이트 오류:`, error);
-                investor.topStocks = []; // 오류 시 빈 배열
+        // 각 투자자별 캐시된 데이터 먼저 표시
+        investors.forEach(investor => {
+            if (!investor) return;
+            
+            // 캐시된 데이터 확인
+            const cached = getCachedStocks(investor.id);
+            if (cached && cached.length > 0) {
+                investor.topStocks = cached.slice(0, 3);
+                renderInvestorCards(); // 바로 UI 업데이트
+            } else if (!investor.topStocks || investor.topStocks.length === 0) {
+                // 캐시도 없고 기존 데이터도 없으면 목 데이터 생성
+                investor.topStocks = [
+                    generateInitialMockStocks('AAPL', 'Apple Inc.'),
+                    generateInitialMockStocks('MSFT', 'Microsoft Corp'),
+                    generateInitialMockStocks('GOOGL', 'Alphabet Inc')
+                ];
+                renderInvestorCards(); // 바로 UI 업데이트
             }
-        }));
+        });
+        
+        // 각 투자자별 주식 데이터 업데이트 (비동기)
+        investors.forEach(async (investor) => {
+            if (!investor) return;
+            
+            try {
+                // 실제 API 호출은 비동기로 진행
+                const stocks = await window.StockAPI.getStocksByInvestor(investor.id);
+                if (stocks && stocks.length > 0) {
+                    investor.topStocks = stocks.slice(0, 3); // 상위 3개만
+                    setCachedStocks(investor.id, stocks); // 캐시 저장
+                    renderInvestorCards(); // UI 업데이트
+                }
+            } catch (error) {
+                console.error(`${investor?.name || 'Unknown'} 주식 데이터 업데이트 오류:`, error);
+                // 오류 시에도 목 데이터 표시 유지
+            }
+        });
         
         // UI 업데이트
-        renderInvestorCards();
         updateLastUpdatedTime();
         
     } catch (error) {
@@ -148,6 +220,15 @@ async function updateStockData(forceUpdate = false) {
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // 기본 목 데이터 준비
+        const defaultMockData = {
+            'warren-buffett': [
+                { symbol: 'AAPL', name: 'Apple Inc.', price: 175.34, change: 2.3, roe: 45.6, debtToEquity: 0.3, pe: 28.7, score: 95, isMock: true, lastUpdated: new Date() },
+                { symbol: 'KO', name: 'Coca-Cola Co', price: 65.82, change: 0.5, roe: 38.2, debtToEquity: 0.5, pe: 22.4, score: 88, isMock: true, lastUpdated: new Date() },
+                { symbol: 'BRK.B', name: 'Berkshire Hathaway', price: 420.50, change: 1.2, roe: 12.8, debtToEquity: 0.2, pe: 18.5, score: 92, isMock: true, lastUpdated: new Date() }
+            ]
+        };
+        
         // InvestorData API가 로드되었는지 확인
         if (!window.InvestorData) {
             throw new Error('InvestorData API가 로드되지 않았습니다.');
@@ -156,7 +237,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 투자자 기본 정보 가져오기
         investors = window.InvestorData.getInvestorsForMainPage();
         
-        // 초기 카드 렌더링 - 기본 정보만 먼저 표시
+        // undefined 확인 및 보정
+        investors = investors.map(investor => {
+            if (!investor || typeof investor !== 'object') {
+                return {
+                    id: 'unknown',
+                    name: '투자자',
+                    philosophy: '정보가 없습니다.',
+                    quote: '정보가 없습니다.',
+                    image: '/images/default-investor.png',
+                    topStocks: []
+                };
+            }
+            
+            // 기본값 설정
+            return {
+                id: investor.id || 'unknown',
+                name: investor.name || '투자자',
+                philosophy: investor.philosophy || '정보가 없습니다.',
+                quote: investor.quote || '정보가 없습니다.',
+                image: investor.image || '/images/default-investor.png',
+                topStocks: investor.topStocks || [],
+                ...investor
+            };
+        });
+        
+        // 기본 목 데이터 적용 (없는 경우만)
+        investors.forEach(investor => {
+            if (investor.id && defaultMockData[investor.id] && (!investor.topStocks || investor.topStocks.length === 0)) {
+                investor.topStocks = defaultMockData[investor.id];
+            }
+            
+            // 그래도 없으면 기본 목 데이터 생성
+            if (!investor.topStocks || investor.topStocks.length === 0) {
+                investor.topStocks = [
+                    generateInitialMockStocks('AAPL', 'Apple Inc.'),
+                    generateInitialMockStocks('MSFT', 'Microsoft Corp'),
+                    generateInitialMockStocks('GOOGL', 'Alphabet Inc')
+                ];
+            }
+        });
+        
+        // 초기 카드 렌더링 - 기본 정보/목 데이터 먼저 표시
         renderInvestorCards();
         
         // 초기 시간 설정
@@ -164,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // API 키 설정 - 실제 API 키로 변경
         if (window.StockAPI && window.StockAPI.setApiKey) {
-            window.StockAPI.setApiKey('alphavantage_api_key_here');
+            window.StockAPI.setApiKey('YOUR_API_KEY_HERE'); // 실제 키로 교체
         }
         
         // 새로고침 버튼 이벤트
@@ -173,13 +295,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             refreshButton.addEventListener('click', () => updateStockData(true)); // 강제 업데이트
         }
         
-        // 모든 종목 이름 미리 로드 (API 사용량 최적화)
-        if (window.StockAPI && window.StockAPI.initializeStockNames) {
-            await window.StockAPI.initializeStockNames();
-        }
-        
-        // 주식 데이터 가져오기 - 페이지 로드 후 바로 실행
-        updateStockData();
+        // 주식 데이터 가져오기 (백그라운드에서 실행)
+        setTimeout(() => {
+            updateStockData();
+        }, 100);
         
         // 5분마다 자동 업데이트
         setInterval(updateStockData, 5 * 60 * 1000);
@@ -192,6 +311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="error-container">
                     <h2>데이터를 불러올 수 없습니다</h2>
                     <p>${error.message}</p>
+                    <p>잠시 후 다시 시도해주세요.</p>
                     <button onclick="location.reload()">다시 시도</button>
                 </div>
             `;

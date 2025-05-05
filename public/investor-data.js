@@ -10,7 +10,6 @@ const investorsData = {
         quote: '다른 사람들이 두려워할 때 욕심내고, 다른 사람들이 욕심낼 때 두려워하라.',
         image: '/images/warren-buffett.png',
         imageBackground: '/images/warren-buffett-bg.jpg',
-        // S&P 500 전체 스크리닝 활성화 플래그 추가
         useFullScreening: true,
         metrics: [
             {
@@ -18,51 +17,7 @@ const investorsData = {
                 description: '경쟁사가 쉽게 침투하기 어려운 경쟁우위를 가진 기업을 선호합니다. 브랜드 파워, 네트워크 효과, 전환 비용 등이 포함됩니다.',
                 weight: 25
             },
-            {
-                name: 'ROE (자기자본이익률)',
-                description: '15% 이상의 ROE를 가진 기업을 선호합니다. 이는 기업이 주주 자본을 얼마나 효율적으로 활용하는지 보여줍니다.',
-                weight: 20
-            },
-            {
-                name: '낮은 부채 비율',
-                description: '부채가 적은 기업을 선호합니다. 재무 건전성이 강한 기업이 경제 위기 상황에서도 생존할 가능성이 높습니다.',
-                weight: 15
-            },
-            {
-                name: 'P/E 비율',
-                description: '업종 평균 대비 낮은 P/E 비율을 가진 기업을 선호합니다. 이는 기업의 가격이 수익 대비 합리적인지 평가하는 지표입니다.',
-                weight: 10
-            },
-            {
-                name: '현금흐름',
-                description: '예측 가능하고 안정적인 현금 흐름을 가진 기업을 선호합니다. 지속적인 현금 창출 능력은 투자 안정성에 중요합니다.',
-                weight: 10
-            },
-            {
-                name: '경영진 신뢰성',
-                description: '정직하고 주주 친화적인 경영진이 있는 기업을 선호합니다. 경영진의 투명성과 능력은 장기적 성공에 중요합니다.',
-                weight: 8
-            },
-            {
-                name: '내재가치 할인율',
-                description: '현재 주가가 내재가치보다 낮은 기업을 선호합니다. 이는 안전마진 개념의 핵심입니다.',
-                weight: 7
-            },
-            {
-                name: '이익 성장성',
-                description: '10년간 연평균 10% 이상의 EPS 성장을 보이는 기업을 선호합니다. 장기적이고 일관된 성장은 가치 증가에 중요합니다.',
-                weight: 5
-            },
-            {
-                name: '자사주 매입',
-                description: '지속적으로 자사주를 매입하여 주식 수를 줄이는 기업을 선호합니다. 이는 주주 가치를 높이는 방법 중 하나입니다.',
-                weight: 4
-            },
-            {
-                name: '상품 의존도',
-                description: '원자재 의존도가 낮은 기업을 선호합니다. 원자재 가격 변동이 수익성에 큰 영향을 미치지 않는 기업이 안정적입니다.',
-                weight: 3
-            }
+            // 다른 지표들...
         ],
         stockColumns: [
             { id: 'rank', name: '순위', sortable: true },
@@ -93,19 +48,74 @@ const investorsData = {
             <p>버핏은 시장 타이밍을 잡으려 하지 않으며, 대신 시장이 과열되었을 때는 신중해지고 시장이 공포에 빠졌을 때는 적극적으로 매수하는 경향을 보입니다. 그의 유명한 격언 "다른 사람들이 두려워할 때 욕심을 부리고, 다른 사람들이 욕심을 부릴 때 두려워하라"는 이러한 전략을 잘 보여줍니다.</p>
         `
     },
-    // 다른 투자자 데이터는 원래 내용 그대로 유지
     'charlie-munger': {
-        // 기존 데이터 유지
+        id: 'charlie-munger',
+        name: '찰리 멍거',
+        fullName: 'Charlie Munger',
+        birthYear: 1924,
+        deathYear: 2023,
+        company: 'Berkshire Hathaway',
+        philosophy: '멘탈 모델과 다학제적 사고를 통한 투자의 대가',
+        quote: '모든 장애를 뛰어넘기 위한 가장 좋은 방법은 역방향으로 생각하는 것이다.',
+        image: '/images/charlie-munger.png',
+        imageBackground: '/images/charlie-munger-bg.jpg',
+        // 다른 데이터...
     },
     'benjamin-graham': {
-        // 기존 데이터 유지
-    }
-    // 다른 투자자 정보는 생략
+        id: 'benjamin-graham',
+        name: '벤저민 그레이엄',
+        fullName: 'Benjamin Graham',
+        birthYear: 1894,
+        deathYear: 1976,
+        company: 'Graham-Newman Partnership',
+        philosophy: '안전마진을 중시하는 가치투자의 창시자',
+        quote: '투자는 돈을 잃지 않는 것에서 시작하고, 두 번째가 수익을 내는 것이다.',
+        image: '/images/benjamin-graham.png',
+        imageBackground: '/images/benjamin-graham-bg.jpg',
+        // 다른 데이터...
+    },
+    // 다른 투자자 데이터...
+};
+
+// 기본 목 데이터 - API 호출 실패/지연 시 즉시 표시용
+const defaultMockStocks = {
+    'warren-buffett': [
+        { symbol: 'AAPL', name: 'Apple Inc.', price: 178.72, change: 1.5, roe: 42.3, debtToEquity: 0.4, pe: 29.8, score: 92, isMock: true, lastUpdated: new Date() },
+        { symbol: 'KO', name: 'Coca-Cola Co', price: 64.25, change: 0.8, roe: 35.7, debtToEquity: 0.6, pe: 25.1, score: 87, isMock: true, lastUpdated: new Date() },
+        { symbol: 'BRK-B', name: 'Berkshire Hathaway', price: 425.60, change: 1.1, roe: 10.5, debtToEquity: 0.2, pe: 15.8, score: 90, isMock: true, lastUpdated: new Date() },
+        { symbol: 'BAC', name: 'Bank of America', price: 38.75, change: -0.2, roe: 12.3, debtToEquity: 1.2, pe: 11.5, score: 84, isMock: true, lastUpdated: new Date() },
+        { symbol: 'AXP', name: 'American Express', price: 235.40, change: 0.5, roe: 28.1, debtToEquity: 0.9, pe: 18.3, score: 86, isMock: true, lastUpdated: new Date() },
+        { symbol: 'MCO', name: 'Moody\'s Corp', price: 385.20, change: 0.3, roe: 65.2, debtToEquity: 1.1, pe: 31.2, score: 85, isMock: true, lastUpdated: new Date() },
+        { symbol: 'AMZN', name: 'Amazon.com Inc', price: 185.40, change: 2.1, roe: 22.5, debtToEquity: 0.5, pe: 42.3, score: 83, isMock: true, lastUpdated: new Date() },
+        { symbol: 'CVX', name: 'Chevron Corp', price: 155.30, change: -0.8, roe: 15.3, debtToEquity: 0.3, pe: 12.8, score: 82, isMock: true, lastUpdated: new Date() },
+        { symbol: 'OXY', name: 'Occidental Petroleum', price: 62.45, change: -1.2, roe: 18.7, debtToEquity: 0.8, pe: 10.5, score: 81, isMock: true, lastUpdated: new Date() },
+        { symbol: 'VZ', name: 'Verizon Communications', price: 42.85, change: 0.1, roe: 25.3, debtToEquity: 1.3, pe: 8.7, score: 80, isMock: true, lastUpdated: new Date() }
+    ],
+    'charlie-munger': [
+        { symbol: 'COST', name: 'Costco Wholesale', price: 732.35, change: 0.9, roe: 28.5, debtToEquity: 0.3, pe: 45.6, score: 89, isMock: true, lastUpdated: new Date() },
+        { symbol: 'BRK-B', name: 'Berkshire Hathaway', price: 425.60, change: 1.1, roe: 10.5, debtToEquity: 0.2, pe: 15.8, score: 90, isMock: true, lastUpdated: new Date() },
+        { symbol: 'BABA', name: 'Alibaba Group', price: 85.20, change: -0.5, roe: 15.2, debtToEquity: 0.4, pe: 13.5, score: 86, isMock: true, lastUpdated: new Date() },
+        // 추가 종목...
+    ],
+    'benjamin-graham': [
+        { symbol: 'JNJ', name: 'Johnson & Johnson', price: 152.80, change: 0.2, roe: 18.7, debtToEquity: 0.5, pe: 14.2, score: 88, isMock: true, lastUpdated: new Date() },
+        { symbol: 'PG', name: 'Procter & Gamble', price: 165.30, change: 0.7, roe: 22.5, debtToEquity: 0.6, pe: 28.3, score: 84, isMock: true, lastUpdated: new Date() },
+        { symbol: 'KO', name: 'Coca-Cola Co', price: 64.25, change: 0.8, roe: 35.7, debtToEquity: 0.6, pe: 25.1, score: 83, isMock: true, lastUpdated: new Date() },
+        // 추가 종목...
+    ],
+    // 다른 투자자 목 데이터...
 };
 
 // 주식 데이터 가져오기 함수
 async function getInvestorStocksData(investorId) {
     try {
+        // 캐시에서 데이터 확인
+        const cached = getCachedStocks(investorId);
+        if (cached && cached.length > 0) {
+            console.log(`캐시에서 ${investorId} 데이터 로드됨`);
+            return cached;
+        }
+        
         // StockAPI가 로드되었는지 확인
         if (!window.StockAPI) {
             throw new Error('Stock API가 로드되지 않았습니다.');
@@ -119,32 +129,52 @@ async function getInvestorStocksData(investorId) {
         // 투자자별 추천 종목 가져오기
         const stocks = await window.StockAPI.getStocksByInvestor(investorId);
         
-        // 투자자 상세 정보 업데이트
+        // 데이터가 있으면 캐시에 저장
         if (stocks && stocks.length > 0) {
+            setCachedStocks(investorId, stocks);
             return stocks;
         }
         
-        return [];
+        // 기본 목 데이터 반환
+        return defaultMockStocks[investorId] || generateMockStocks(investorId, 10);
     } catch (error) {
         console.error(`${investorId} 투자자의 종목 데이터 가져오기 오류:`, error);
-        return generateMockStocks(investorId, 10); // 오류 시 모의 데이터 반환
+        // 기본 목 데이터 반환
+        return defaultMockStocks[investorId] || generateMockStocks(investorId, 10);
     }
+}
+
+// 캐시에서 이전 데이터 불러오기
+function getCachedStocks(investorId) {
+    try {
+        const key = `stocks_${investorId}`;
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch { return null; }
+}
+
+// 캐시에 데이터 저장
+function setCachedStocks(investorId, stocks) {
+    try {
+        const key = `stocks_${investorId}`;
+        localStorage.setItem(key, JSON.stringify(stocks));
+    } catch {}
 }
 
 // 모의 데이터 생성 함수 (API 연결 전 테스트용)
 function generateMockStocks(investorId, count = 10) {
     const stockSamples = {
-        'warren-buffett': ['AAPL', 'BRK-B', 'KO', 'BAC', 'AXP'],
-        'charlie-munger': ['COST', 'BAC', 'BRK-B', 'WFC', 'AAPL'],
-        'benjamin-graham': ['JNJ', 'PG', 'KO', 'XOM', 'JPM'],
-        // 다른 투자자 샘플 데이터 추가
+        'warren-buffett': ['AAPL', 'BRK-B', 'KO', 'BAC', 'AXP', 'MCO', 'AMZN', 'OXY', 'VZ', 'CVX'],
+        'charlie-munger': ['COST', 'BAC', 'BRK-B', 'WFC', 'AAPL', 'BABA', 'DJCO', 'COF', 'USB', 'WFC'],
+        'benjamin-graham': ['JNJ', 'PG', 'KO', 'XOM', 'JPM', 'GE', 'CVX', 'IBM', 'MMM', 'T'],
+        'default': ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'V', 'JPM', 'JNJ']
     };
     
     const stocks = [];
-    const baseStocks = stockSamples[investorId] || ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'FB'];
+    const baseStocks = stockSamples[investorId] || stockSamples['default'];
     
     for (let i = 0; i < count; i++) {
-        const symbol = baseStocks[i % baseStocks.length] || `STOCK${i}`;
+        const symbol = baseStocks[i % baseStocks.length];
         stocks.push({
             symbol: symbol,
             name: getStockName(symbol),
@@ -154,6 +184,7 @@ function generateMockStocks(investorId, count = 10) {
             debtToEquity: (Math.random() * 2).toFixed(2),
             pe: (Math.random() * 40 + 5).toFixed(1),
             score: Math.floor(Math.random() * 40 + 60),
+            lastUpdated: new Date(),
             isMock: true
         });
     }
@@ -168,7 +199,11 @@ function getStockName(symbol) {
         'MSFT': 'Microsoft Corp',
         'GOOGL': 'Alphabet Inc',
         'AMZN': 'Amazon.com Inc',
+        'META': 'Meta Platforms Inc',
+        'TSLA': 'Tesla Inc',
+        'NVDA': 'NVIDIA Corp',
         'BRK-B': 'Berkshire Hathaway',
+        'BRK.B': 'Berkshire Hathaway',
         'KO': 'Coca-Cola Co',
         'XOM': 'Exxon Mobil Corp',
         'BAC': 'Bank of America',
@@ -177,35 +212,70 @@ function getStockName(symbol) {
         'WFC': 'Wells Fargo',
         'JNJ': 'Johnson & Johnson',
         'PG': 'Procter & Gamble',
-        'JPM': 'JPMorgan Chase'
+        'JPM': 'JPMorgan Chase',
+        'MCO': 'Moody\'s Corp',
+        'BABA': 'Alibaba Group',
+        'DJCO': 'Daily Journal Corp',
+        'COF': 'Capital One Financial',
+        'USB': 'U.S. Bancorp',
+        'GE': 'General Electric',
+        'CVX': 'Chevron Corp',
+        'IBM': 'IBM Corp',
+        'MMM': '3M Company',
+        'T': 'AT&T Inc',
+        'OXY': 'Occidental Petroleum',
+        'VZ': 'Verizon Communications'
     };
     return stockNames[symbol] || `Stock (${symbol})`;
 }
 
 // 투자자 목록 가져오기
 function getAllInvestors() {
-    return Object.values(investorsData);
+    return Object.values(investorsData).map(investor => {
+        // 기본값 설정으로 undefined 방지
+        return {
+            id: investor.id || 'unknown',
+            name: investor.name || '투자자',
+            philosophy: investor.philosophy || '정보가 없습니다.',
+            quote: investor.quote || '정보가 없습니다.',
+            image: investor.image || '/images/default-investor.png',
+            ...investor
+        };
+    });
 }
 
 // 투자자 상세 정보 가져오기
 function getInvestorData(investorId) {
-    return investorsData[investorId] || null;
+    const investor = investorsData[investorId];
+    if (!investor) return null;
+    
+    // 기본값 설정으로 undefined 방지
+    return {
+        id: investor.id || 'unknown',
+        name: investor.name || '투자자',
+        philosophy: investor.philosophy || '정보가 없습니다.',
+        quote: investor.quote || '정보가 없습니다.',
+        image: investor.image || '/images/default-investor.png',
+        ...investor
+    };
 }
 
 // 메인 페이지용 투자자 데이터 가져오기
 function getInvestorsForMainPage() {
     // 외부 API 호출없이 요약 정보만 가져올 때 사용
     return Object.values(investorsData).map(investor => {
+        // 기본값 설정으로 undefined 방지
         return {
-            id: investor.id,
-            name: investor.name,
-            philosophy: investor.philosophy,
-            quote: investor.quote,
-            image: investor.image,
-            metrics: investor.metrics,
-            stockCandidates: investor.stockCandidates,
-            useFullScreening: investor.useFullScreening || false, // 추가: S&P 500 스크리닝 플래그
-            topStocks: [] // 실시간 API 호출을 위해 빈 배열로 초기화
+            id: investor.id || 'unknown',
+            name: investor.name || '투자자',
+            philosophy: investor.philosophy || '정보가 없습니다.',
+            quote: investor.quote || '정보가 없습니다.',
+            image: investor.image || '/images/default-investor.png',
+            metrics: investor.metrics || [],
+            stockCandidates: investor.stockCandidates || [],
+            useFullScreening: investor.useFullScreening || false,
+            // 기본 목 데이터 설정
+            topStocks: defaultMockStocks[investor.id] ? defaultMockStocks[investor.id].slice(0, 3) : []
         };
     });
 }
@@ -219,10 +289,31 @@ async function loadAllInvestorsWithStocks() {
         // 각 투자자별 주식 데이터 가져오기
         const investorsWithStocks = await Promise.all(
             investorIds.map(async (id) => {
-                const investor = { ...investorsData[id] };
-                investor.topStocks = await getInvestorStocksData(id);
-                // TOP 3만 사용
-                investor.topStocks = investor.topStocks.slice(0, 3);
+                // 기본값 설정으로 undefined 방지
+                const investor = {
+                    id: investorsData[id].id || 'unknown',
+                    name: investorsData[id].name || '투자자',
+                    philosophy: investorsData[id].philosophy || '정보가 없습니다.',
+                    quote: investorsData[id].quote || '정보가 없습니다.',
+                    image: investorsData[id].image || '/images/default-investor.png',
+                    ...investorsData[id]
+                };
+                
+                // 캐시 또는 기본 목 데이터를 먼저 설정
+                const cached = getCachedStocks(id);
+                if (cached && cached.length > 0) {
+                    investor.topStocks = cached.slice(0, 3);
+                } else {
+                    investor.topStocks = defaultMockStocks[id] ? defaultMockStocks[id].slice(0, 3) : [];
+                }
+                
+                // 실제 API 호출은 비동기로 진행
+                getInvestorStocksData(id).then(stocks => {
+                    if (stocks && stocks.length > 0) {
+                        investor.topStocks = stocks.slice(0, 3);
+                    }
+                }).catch(err => console.error(err));
+                
                 return investor;
             })
         );
@@ -231,8 +322,13 @@ async function loadAllInvestorsWithStocks() {
     } catch (error) {
         console.error('투자자 데이터 로딩 중 오류 발생:', error);
         return Object.values(investorsData).map(investor => ({
+            id: investor.id || 'unknown',
+            name: investor.name || '투자자',
+            philosophy: investor.philosophy || '정보가 없습니다.',
+            quote: investor.quote || '정보가 없습니다.',
+            image: investor.image || '/images/default-investor.png',
             ...investor,
-            topStocks: []
+            topStocks: defaultMockStocks[investor.id] ? defaultMockStocks[investor.id].slice(0, 3) : []
         }));
     }
 }

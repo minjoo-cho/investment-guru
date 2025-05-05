@@ -4,7 +4,7 @@ function getInvestorIdFromUrl() {
     return urlParams.get('id') || 'warren-buffett';
 }
 
-// 로컬스토리지에서 이전 데이터 불러오기
+// 캐시에서 이전 데이터 불러오기
 function getCachedStocks(investorId) {
     try {
         const key = `stocks_${investorId}`;
@@ -13,7 +13,7 @@ function getCachedStocks(investorId) {
     } catch { return null; }
 }
 
-// 로컬스토리지에 데이터 저장
+// 캐시에 데이터 저장
 function setCachedStocks(investorId, stocks) {
     try {
         const key = `stocks_${investorId}`;
@@ -40,7 +40,12 @@ async function initializeInvestorPage() {
     setInvestorDetailInfo(investor);
     setInvestorBackgroundImage(investor);
     renderMetrics(investor.metrics);
-    document.getElementById('strategy-content').innerHTML = investor.strategy;
+    
+    // 전략 정보가 없는 경우 기본 메시지 표시
+    const strategyContent = document.getElementById('strategy-content');
+    if (strategyContent) {
+        strategyContent.innerHTML = investor.strategy || '투자 전략 정보가 없습니다.';
+    }
 
     if (window.StockAPI) {
         window.StockAPI.setApiKey('YOUR_API_KEY_HERE'); // 실제 API 키로 교체
@@ -55,29 +60,81 @@ async function initializeInvestorPage() {
         });
     }
 
-    // 1. 캐시/목 데이터라도 먼저 보여주기
-    const cached = getCachedStocks(investorId);
-    if (cached && cached.length > 0) {
-        renderStockTable(investor.stockColumns, cached, true);
-        showInfoMessage("이전 데이터 기준으로 표시 중입니다. 최신 데이터 로딩 중...");
+    // 캐시 또는 기본 목 데이터를 먼저 표시
+    let initialStocks = getCachedStocks(investorId);
+    if (!initialStocks || initialStocks.length === 0) {
+        // 캐시에 없으면 기본 목 데이터 생성
+        initialStocks = generateDefaultMockStocks(investorId);
+        showInfoMessage("초기 데이터로 표시 중입니다. 최신 데이터 로딩 중...");
+    } else {
+        showInfoMessage("캐시된 데이터로 표시 중입니다. 최신 데이터 로딩 중...");
     }
+    
+    renderStockTable(investor.stockColumns, initialStocks);
 
-    // 2. 최신 데이터 시도
     try {
         const loadingElement = document.getElementById('loading');
         if (loadingElement) loadingElement.style.display = 'block';
 
+        // 실제 API 호출로 최신 데이터 시도
         const stocks = await window.InvestorData.getInvestorStocksData(investorId);
-        renderStockTable(investor.stockColumns, stocks, false);
-        setCachedStocks(investorId, stocks);
+        if (stocks && stocks.length > 0) {
+            renderStockTable(investor.stockColumns, stocks);
+            setCachedStocks(investorId, stocks);
+            hideInfoMessage();
+        }
 
         if (loadingElement) loadingElement.style.display = 'none';
     } catch (error) {
         console.error('주식 데이터 로딩 중 오류 발생:', error);
-        showErrorMessage("주식 데이터를 가져오는 중 오류가 발생했습니다. 다시 시도해 주세요.");
+        showErrorMessage("API 데이터를 가져오는 중 오류가 발생했습니다. 이전 데이터로 표시합니다.");
         const loadingElement = document.getElementById('loading');
         if (loadingElement) loadingElement.style.display = 'none';
     }
+}
+
+// 기본 목 데이터 생성
+function generateDefaultMockStocks(investorId) {
+    const defaultStocks = {
+        'warren-buffett': [
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 178.72, change: 1.5, roe: 42.3, debtToEquity: 0.4, pe: 29.8, score: 92, isMock: true, lastUpdated: new Date() },
+            { symbol: 'KO', name: 'Coca-Cola Co', price: 64.25, change: 0.8, roe: 35.7, debtToEquity: 0.6, pe: 25.1, score: 87, isMock: true, lastUpdated: new Date() },
+            { symbol: 'BRK-B', name: 'Berkshire Hathaway', price: 425.60, change: 1.1, roe: 10.5, debtToEquity: 0.2, pe: 15.8, score: 90, isMock: true, lastUpdated: new Date() },
+            { symbol: 'BAC', name: 'Bank of America', price: 38.75, change: -0.2, roe: 12.3, debtToEquity: 1.2, pe: 11.5, score: 84, isMock: true, lastUpdated: new Date() },
+            { symbol: 'AXP', name: 'American Express', price: 235.40, change: 0.5, roe: 28.1, debtToEquity: 0.9, pe: 18.3, score: 86, isMock: true, lastUpdated: new Date() },
+            { symbol: 'MCO', name: 'Moody\'s Corp', price: 385.20, change: 0.3, roe: 65.2, debtToEquity: 1.1, pe: 31.2, score: 85, isMock: true, lastUpdated: new Date() },
+            { symbol: 'AMZN', name: 'Amazon.com Inc', price: 185.40, change: 2.1, roe: 22.5, debtToEquity: 0.5, pe: 42.3, score: 83, isMock: true, lastUpdated: new Date() },
+            { symbol: 'CVX', name: 'Chevron Corp', price: 155.30, change: -0.8, roe: 15.3, debtToEquity: 0.3, pe: 12.8, score: 82, isMock: true, lastUpdated: new Date() },
+            { symbol: 'OXY', name: 'Occidental Petroleum', price: 62.45, change: -1.2, roe: 18.7, debtToEquity: 0.8, pe: 10.5, score: 81, isMock: true, lastUpdated: new Date() },
+            { symbol: 'VZ', name: 'Verizon Communications', price: 42.85, change: 0.1, roe: 25.3, debtToEquity: 1.3, pe: 8.7, score: 80, isMock: true, lastUpdated: new Date() }
+        ],
+        // 다른 투자자 기본 데이터...
+    };
+    
+    if (defaultStocks[investorId]) {
+        return defaultStocks[investorId];
+    }
+    
+    // 기본 데이터가 없으면 생성
+    const symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'JPM', 'JNJ', 'V'];
+    const names = [
+        'Apple Inc.', 'Microsoft Corp', 'Alphabet Inc', 'Amazon.com Inc', 
+        'Meta Platforms Inc', 'Tesla Inc', 'NVIDIA Corp', 'JPMorgan Chase', 
+        'Johnson & Johnson', 'Visa Inc'
+    ];
+    
+    return symbols.map((symbol, index) => ({
+        symbol: symbol,
+        name: names[index] || `Company ${symbol}`,
+        price: 100 + Math.random() * 900,
+        change: (Math.random() * 10 - 5).toFixed(2),
+        roe: (Math.random() * 30).toFixed(1),
+        debtToEquity: (Math.random() * 2).toFixed(2),
+        pe: (Math.random() * 40 + 5).toFixed(1),
+        score: Math.floor(Math.random() * 40 + 60),
+        lastUpdated: new Date(),
+        isMock: true
+    })).sort((a, b) => b.score - a.score);
 }
 
 // 안내 메시지 표시
@@ -89,10 +146,22 @@ function showInfoMessage(msg) {
         infoDiv.style.color = '#888';
         infoDiv.style.fontSize = '13px';
         infoDiv.style.margin = '8px 0';
-        const target = document.getElementById('stock-table-section') || document.body;
+        infoDiv.style.padding = '4px 8px';
+        infoDiv.style.backgroundColor = '#f8f9fa';
+        infoDiv.style.borderRadius = '4px';
+        const target = document.querySelector('.stock-table-container') || document.querySelector('.stocks-section') || document.body;
         target.insertBefore(infoDiv, target.firstChild);
     }
     infoDiv.textContent = msg;
+    infoDiv.style.display = 'block';
+}
+
+// 안내 메시지 숨기기
+function hideInfoMessage() {
+    const infoDiv = document.getElementById('info-message');
+    if (infoDiv) {
+        infoDiv.style.display = 'none';
+    }
 }
 
 // 오류 메시지 표시
@@ -104,13 +173,89 @@ function showErrorMessage(msg) {
         errorDiv.style.color = '#d9534f';
         errorDiv.style.fontSize = '14px';
         errorDiv.style.margin = '10px 0';
-        const target = document.getElementById('stock-table-section') || document.body;
+        errorDiv.style.padding = '8px 12px';
+        errorDiv.style.backgroundColor = '#f8d7da';
+        errorDiv.style.borderRadius = '4px';
+        const target = document.querySelector('.stock-table-container') || document.querySelector('.stocks-section') || document.body;
         target.insertBefore(errorDiv, target.firstChild);
     }
     errorDiv.textContent = msg;
+    errorDiv.style.display = 'block';
 }
 
-function renderStockTable(columns, stocks, isCached = false) {
+// 오류 메시지 숨기기
+function hideErrorMessage() {
+    const errorDiv = document.getElementById('error-message');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+}
+
+// 투자자 프로필 정보 설정
+function setInvestorProfileInfo(investor) {
+    const profileName = document.getElementById('profile-name');
+    if (profileName) profileName.textContent = investor.name || '투자자';
+    
+    const profileFullName = document.getElementById('profile-full-name');
+    if (profileFullName) profileFullName.textContent = investor.fullName || '';
+    
+    const profileCompany = document.getElementById('profile-company');
+    if (profileCompany) profileCompany.textContent = investor.company || '';
+    
+    const profilePhilosophy = document.getElementById('profile-philosophy');
+    if (profilePhilosophy) profilePhilosophy.textContent = investor.philosophy || '';
+}
+
+// 투자자 상세 정보 설정
+function setInvestorDetailInfo(investor) {
+    const birthInfo = document.getElementById('birth-info');
+    if (birthInfo) {
+        if (investor.deathYear) {
+            birthInfo.textContent = `${investor.birthYear || '?'} - ${investor.deathYear || '?'}`;
+        } else {
+            birthInfo.textContent = investor.birthYear || '정보 없음';
+        }
+    }
+    
+    const quoteText = document.getElementById('quote-text');
+    if (quoteText) quoteText.textContent = investor.quote || '인용구 정보가 없습니다.';
+}
+
+// 투자자 배경 이미지 설정
+function setInvestorBackgroundImage(investor) {
+    const bgImage = document.getElementById('investor-banner');
+    if (bgImage && investor.imageBackground) {
+        bgImage.style.backgroundImage = `url(${investor.imageBackground})`;
+    }
+}
+
+// 투자자 지표 렌더링
+function renderMetrics(metrics) {
+    const metricsContainer = document.getElementById('metrics-container');
+    if (!metricsContainer) return;
+    
+    metricsContainer.innerHTML = '';
+    
+    if (!metrics || !Array.isArray(metrics) || metrics.length === 0) {
+        metricsContainer.innerHTML = '<p>투자 지표 정보가 없습니다.</p>';
+        return;
+    }
+    
+    metrics.forEach(metric => {
+        const metricBox = document.createElement('div');
+        metricBox.className = 'metric-box';
+        
+        metricBox.innerHTML = `
+            <h3>${metric.name} <span>(${metric.weight}%)</span></h3>
+            <p>${metric.description || '설명 정보가 없습니다.'}</p>
+        `;
+        
+        metricsContainer.appendChild(metricBox);
+    });
+}
+
+// 주식 테이블 렌더링
+function renderStockTable(columns, stocks) {
     const tableHead = document.getElementById('table-head');
     if (!tableHead) return;
     tableHead.innerHTML = '';
@@ -124,6 +269,7 @@ function renderStockTable(columns, stocks, isCached = false) {
         if (column.highlight) th.classList.add('highlighted');
         headerRow.appendChild(th);
     });
+    
     // 데이터 출처 칼럼 추가
     const infoTh = document.createElement('th');
     infoTh.textContent = '데이터 출처';
@@ -131,10 +277,11 @@ function renderStockTable(columns, stocks, isCached = false) {
 
     tableHead.appendChild(headerRow);
 
-    renderTableBody(columns, stocks, isCached);
+    renderTableBody(columns, stocks);
 }
 
-function renderTableBody(columns, stocks, isCached = false) {
+// 주식 테이블 바디 렌더링
+function renderTableBody(columns, stocks) {
     const tableBody = document.getElementById('table-body');
     if (!tableBody) return;
     tableBody.innerHTML = '';
@@ -142,7 +289,7 @@ function renderTableBody(columns, stocks, isCached = false) {
     if (!stocks || !Array.isArray(stocks) || stocks.length === 0) {
         const emptyRow = document.createElement('tr');
         const emptyCell = document.createElement('td');
-        emptyCell.colSpan = columns.length + 1;
+        emptyCell.colSpan = columns.length + 1; // +1: 데이터 출처 칼럼
         emptyCell.textContent = '데이터를 불러오는 중입니다...';
         emptyCell.className = 'empty-message';
         emptyRow.appendChild(emptyCell);
@@ -198,6 +345,38 @@ function renderTableBody(columns, stocks, isCached = false) {
     });
 }
 
-// 나머지 함수(프로필, 상세, 배경, 지표, 정렬, 새로고침, 오류 등)는 기존 코드 그대로 사용
+// 마지막 업데이트 시간 표시
+function updateLastUpdatedTime() {
+    const lastUpdatedElement = document.getElementById('last-updated');
+    if (lastUpdatedElement) {
+        lastUpdatedElement.textContent = new Date().toLocaleTimeString();
+    }
+}
 
+// 주식 데이터 새로고침
+async function refreshStockData(investor) {
+    try {
+        showInfoMessage("데이터 새로고침 중...");
+        hideErrorMessage();
+        
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) loadingElement.style.display = 'block';
+        
+        const stocks = await window.InvestorData.getInvestorStocksData(investor.id);
+        renderStockTable(investor.stockColumns, stocks);
+        setCachedStocks(investor.id, stocks);
+        updateLastUpdatedTime();
+        
+        hideInfoMessage();
+        if (loadingElement) loadingElement.style.display = 'none';
+    } catch (error) {
+        console.error('주식 데이터 새로고침 중 오류:', error);
+        showErrorMessage("새로고침 중 오류가 발생했습니다. 이전 데이터를 유지합니다.");
+        
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) loadingElement.style.display = 'none';
+    }
+}
+
+// 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', initializeInvestorPage);

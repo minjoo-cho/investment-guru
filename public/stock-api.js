@@ -1,5 +1,5 @@
 // 실제 Alpha Vantage API 키로 교체하세요!
-let API_KEY = 'YOUR_API_KEY_HERE';
+let API_KEY = 'R08UTO02ZAP4YZUP';
 
 // 캐시 시스템
 const dataCache = {

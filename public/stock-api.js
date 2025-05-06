@@ -1,201 +1,186 @@
-// 실제 Alpha Vantage API 키로 교체하세요!
-let API_KEY = 'R08UTO02ZAP4YZUP';
+// stock-api.js
 
-// 캐시 시스템
+// Yahoo Finance API (비공식) + CORS 프록시
+const YAHOO_FINANCE_API = 'https://query1.finance.yahoo.com/v7/finance';
+const CORS_PROXY = 'https://corsproxy.io/?'; // 또는 'https://cors-anywhere.herokuapp.com/' 사용 가능
+
+// 캐시 시스템 (24시간 유지)
 const dataCache = {
-    metrics: {},
     stocks: {},
-    lastPriceUpdate: {},
-    lastMetricsUpdate: {}
+    metrics: {},
+    lastUpdated: {}
 };
-const CACHE_DURATION = {
-    PRICE: 3 * 60 * 60 * 1000,
-    METRICS: 24 * 60 * 60 * 1000
-};
-const API_LIMIT = { CALLS_PER_MINUTE: 5 };
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24시간
 
-// API 키 설정 함수
-function setApiKey(key) {
-    API_KEY = key;
-    console.log('API 키가 설정되었습니다.');
+// 토스트 메시지 함수 (script.js에 중복 구현되어 있으면 삭제)
+function showToast(message, type = 'info') {
+    let toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
-// 종목명 매핑
-function getStockName(symbol) {
-    const stockNames = {
-        'AAPL': 'Apple Inc.', 'MSFT': 'Microsoft Corp', 'GOOGL': 'Alphabet Inc',
-        'AMZN': 'Amazon.com Inc', 'META': 'Meta Platforms Inc', 'TSLA': 'Tesla Inc',
-        'BRK.B': 'Berkshire Hathaway', 'KO': 'Coca-Cola Co', 'BAC': 'Bank of America',
-        'JNJ': 'Johnson & Johnson', 'PG': 'Procter & Gamble'
-        // 필요시 추가
+// 캐시 시간 표시 함수
+function timeSince(date) {
+    if (!date) return '';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const seconds = Math.floor((new Date() - d) / 1000);
+    if (seconds < 60) return '방금 전';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}분 전`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}시간 전`;
+    return `${Math.floor(hours / 24)}일 전`;
+}
+
+// Yahoo Finance API 호출 함수
+async function fetchYahooData(symbol, endpoint) {
+    try {
+        const url = `${CORS_PROXY}${YAHOO_FINANCE_API}/${endpoint}?symbols=${symbol}`;
+        const response = await fetch(url);
+        return await response.json();
+    } catch (error) {
+        console.error(`Yahoo API Error (${endpoint}):`, error);
+        return null;
+    }
+}
+
+// 주식 기본 데이터 가져오기
+async function fetchStockData(symbol) {
+    if (dataCache.stocks[symbol] && Date.now() - dataCache.lastUpdated[symbol] < CACHE_DURATION) {
+        return dataCache.stocks[symbol]; // 캐시 반환
+    }
+
+    const data = await fetchYahooData(symbol, 'quote');
+    if (!data?.quoteResponse?.result[0]) {
+        showToast(`"${symbol}"의 최신 데이터를 가져올 수 없습니다. 캐시/목데이터를 표시합니다.`, 'error');
+        return generateMockData(symbol);
+    }
+
+    const quote = data.quoteResponse.result[0];
+    const stockData = {
+        symbol,
+        name: quote.longName || quote.shortName || symbol,
+        price: quote.regularMarketPrice,
+        change: quote.regularMarketChangePercent,
+        lastUpdated: new Date(),
+        isMock: false
     };
-    return stockNames[symbol] || symbol || 'Unknown';
+
+    dataCache.stocks[symbol] = stockData;
+    dataCache.lastUpdated[symbol] = Date.now();
+    return stockData;
 }
 
-// 목 데이터 생성
+// 재무 지표 가져오기 (Yahoo Key Statistics)
+async function fetchStockMetrics(symbol) {
+    if (dataCache.metrics[symbol] && Date.now() - dataCache.lastUpdated[symbol] < CACHE_DURATION) {
+        return dataCache.metrics[symbol];
+    }
+
+    const data = await fetchYahooData(symbol, 'quoteSummary&modules=defaultKeyStatistics,financialData');
+    if (!data?.quoteSummary?.result?.[0]) {
+        showToast(`"${symbol}"의 재무지표를 가져올 수 없습니다. 캐시/목데이터를 표시합니다.`, 'error');
+        return generateMockMetrics(symbol);
+    }
+
+    const stats = data.quoteSummary.result[0];
+    const metrics = {
+        pe: stats.defaultKeyStatistics?.forwardPE?.raw,
+        roic: stats.financialData?.returnOnInvestedCapital?.raw,
+        freeCashflow: stats.financialData?.freeCashflow?.raw,
+        payoutRatio: stats.financialData?.payoutRatio?.raw ? stats.financialData.payoutRatio.raw * 100 : undefined,
+        pegRatio: stats.defaultKeyStatistics?.pegRatio?.raw
+    };
+
+    dataCache.metrics[symbol] = metrics;
+    dataCache.lastUpdated[symbol] = Date.now();
+    return metrics;
+}
+
+// 목데이터 생성 (API 실패 시)
 function generateMockData(symbol) {
     return {
-        symbol: symbol,
-        name: getStockName(symbol),
-        price: Math.round(100 + Math.random() * 900),
+        symbol,
+        name: symbol,
+        price: Math.random() * 500 + 50,
         change: (Math.random() * 10 - 5).toFixed(2),
-        roe: (Math.random() * 30).toFixed(1),
-        debtToEquity: (Math.random() * 2).toFixed(2),
-        pe: (Math.random() * 40 + 5).toFixed(1),
-        score: Math.floor(Math.random() * 40 + 60),
         lastUpdated: new Date(),
         isMock: true
     };
 }
 
-// 캐시에서 불러오기
-function getCachedStocks(investorId) {
-    try {
-        const key = `stocks_${investorId}`;
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
-    } catch { return null; }
+function generateMockMetrics() {
+    return {
+        pe: Math.random() * 30 + 10,
+        roic: Math.random() * 20 + 5,
+        freeCashflow: Math.random() * 1e9 + 1e8,
+        payoutRatio: Math.random() * 50,
+        pegRatio: Math.random() * 2
+    };
 }
 
-// 캐시에 저장
-function setCachedStocks(investorId, stocks) {
-    try {
-        const key = `stocks_${investorId}`;
-        localStorage.setItem(key, JSON.stringify(stocks));
-    } catch {}
+// S&P 500 티커 리스트 가져오기 (위키피디아)
+async function fetchSP500Tickers() {
+    const res = await fetch('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies');
+    const text = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+    const table = doc.querySelector('table.wikitable');
+    return Array.from(table.querySelectorAll('tbody tr td:nth-child(1)')).map(td => td.textContent.trim()).filter(Boolean);
 }
 
-// 주식 데이터(API 실패 시 목 데이터 반환)
-async function fetchStockData(symbol) {
-    try {
-        // 캐시 우선
-        const now = new Date().getTime();
-        if (dataCache.stocks[symbol] && dataCache.lastPriceUpdate[symbol] &&
-            (now - dataCache.lastPriceUpdate[symbol] < CACHE_DURATION.PRICE)) {
-            return dataCache.stocks[symbol];
-        }
-        // 실제 API 호출
-        const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_KEY}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data['Global Quote'] && data['Global Quote']['05. price']) {
-            const quote = data['Global Quote'];
-            const stockData = {
-                symbol: symbol,
-                name: getStockName(symbol),
-                price: parseFloat(quote['05. price']),
-                change: parseFloat(quote['10. change percent']?.replace('%', '') || 0),
-                roe: '', debtToEquity: '', pe: '', score: '', // 재무지표는 별도
-                lastUpdated: new Date(),
-                isMock: false
-            };
-            dataCache.stocks[symbol] = stockData;
-            dataCache.lastPriceUpdate[symbol] = now;
-            return stockData;
-        }
-        // 실패 시 목 데이터
-        return generateMockData(symbol);
-    } catch (e) {
-        return generateMockData(symbol);
-    }
-}
-
-// 종목 메트릭 데이터(API 실패 시 목 데이터 반환)
-async function fetchStockMetrics(symbol) {
-    try {
-        const now = new Date().getTime();
-        if (dataCache.metrics[symbol] && dataCache.lastMetricsUpdate[symbol] &&
-            (now - dataCache.lastMetricsUpdate[symbol] < CACHE_DURATION.METRICS)) {
-            return dataCache.metrics[symbol];
-        }
-        const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${API_KEY}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data && data.Symbol) {
-            const metrics = {
-                symbol: symbol,
-                pe: parseFloat(data.PERatio) || '',
-                roe: parseFloat(data.ReturnOnEquityTTM) || '',
-                debtToEquity: parseFloat(data.DebtToEquityRatio) || '',
-                lastUpdated: new Date(),
-                isMock: false
-            };
-            dataCache.metrics[symbol] = metrics;
-            dataCache.lastMetricsUpdate[symbol] = now;
-            return metrics;
-        }
-        return generateMockData(symbol);
-    } catch (e) {
-        return generateMockData(symbol);
-    }
-}
-
-// 여러 종목 데이터 한번에 가져오기 (API 제한 고려, 목 데이터 fallback)
-async function fetchMultipleStocks(symbols) {
-    const result = {};
-    for (const symbol of symbols) {
-        result[symbol] = await fetchStockData(symbol);
-    }
-    return result;
-}
-async function fetchMultipleStockMetrics(symbols) {
-    const result = {};
-    for (const symbol of symbols) {
-        result[symbol] = await fetchStockMetrics(symbol);
-    }
-    return result;
-}
-
-// 버핏 점수 계산(예시)
-function calculateBuffettScore(metrics) {
+// 투자자별 점수 계산 (예: 찰리 멍거)
+function calculateInvestorScore(metrics, stock) {
     let score = 0;
-    if (metrics.roe) score += Math.min(metrics.roe / 15, 1) * 30;
-    if (metrics.debtToEquity) score += Math.max(0, (1.5 - metrics.debtToEquity) / 1.0) * 25;
-    if (metrics.pe) score += Math.max(0, (30 - metrics.pe) / 15) * 20;
-    score += Math.random() * 25; // 기타 가중치
-    return Math.round(score);
-}
-
-// 투자자별 종목 평가 함수
-async function getStocksByInvestor(investorId) {
-    // 예시: 워렌 버핏만 3개, 나머지도 3개 목 데이터
-    let symbols = ['AAPL', 'KO', 'BRK.B'];
-    if (investorId === 'charlie-munger') symbols = ['COST', 'BRK.B', 'BAC'];
-    if (investorId === 'benjamin-graham') symbols = ['JNJ', 'PG', 'KO'];
-    // 필요시 더 추가
-
-    // 캐시 우선
-    const cached = getCachedStocks(investorId);
-    if (cached && cached.length > 0) return cached;
-
-    // 실제 API 호출(실패시 목 데이터)
-    const stocksData = await fetchMultipleStocks(symbols);
-    const metricsData = await fetchMultipleStockMetrics(symbols);
-
-    const stocks = symbols.map(symbol => {
-        const stock = stocksData[symbol] || generateMockData(symbol);
-        const metrics = metricsData[symbol] || {};
-        return {
-            ...stock,
-            roe: metrics.roe || stock.roe,
-            debtToEquity: metrics.debtToEquity || stock.debtToEquity,
-            pe: metrics.pe || stock.pe,
-            score: calculateBuffettScore(metrics),
-            lastUpdated: stock.lastUpdated || new Date(),
-            isMock: stock.isMock || metrics.isMock
-        };
+    metrics.forEach(metric => {
+        let value = stock[metric.id] || 0;
+        if (metric.inverse) {
+            value = value > 0 ? Math.max(0, 1 - value / metric.target) * 100 : 0;
+        } else {
+            value = Math.min((value / metric.target) * 100, 100);
+        }
+        score += value * metric.weight;
     });
-
-    setCachedStocks(investorId, stocks);
-    return stocks;
+    return score;
 }
 
-// 외부에서 사용할 함수 등록
+// S&P 500 전체 스크리닝 (캐시/에러/토스트 반영)
+async function screenSP500ByInvestor(investorId) {
+    const cacheKey = `screening_${investorId}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+        showToast('캐시된 스크리닝 결과를 표시합니다.', 'info');
+        return JSON.parse(cachedData);
+    }
+
+    const investor = window.InvestorData.getInvestorData(investorId);
+    if (!investor) {
+        showToast('투자자 데이터가 없습니다.', 'error');
+        return [];
+    }
+    const sp500 = await fetchSP500Tickers();
+    showToast('S&P 500 스크리닝을 시작합니다. (최대 30개)', 'info');
+
+    const results = [];
+    for (const ticker of sp500.slice(0, 30)) { // API 제한으로 30개만 처리
+        const stockData = await fetchStockData(ticker);
+        const metrics = await fetchStockMetrics(ticker);
+        const merged = { ...stockData, ...metrics };
+        const score = calculateInvestorScore(investor.metrics, merged);
+        results.push({ ...merged, score });
+    }
+
+    localStorage.setItem(cacheKey, JSON.stringify(results));
+    showToast('스크리닝이 완료되었습니다.', 'info');
+    return results.sort((a, b) => b.score - a.score).slice(0, 10);
+}
+
+// --- window.StockAPI 등록 ---
 window.StockAPI = {
-    setApiKey,
     fetchStockData,
     fetchStockMetrics,
-    fetchMultipleStocks,
-    fetchMultipleStockMetrics,
-    getStocksByInvestor
+    screenSP500ByInvestor,
+    timeSince // UI에서 캐시 시간 표시용으로 사용 가능
 };

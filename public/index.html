@@ -2,54 +2,83 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <title>투자자 스크리닝 데모</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>부자따라 부자되기</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- 기타 스타일/폰트 등 필요시 추가 -->
+    <style>
+        /* Toast 스타일 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #333;
+            color: white;
+            border-radius: 4px;
+            z-index: 1000;
+            opacity: 0;
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .toast.error { background: #dc3545; }
+        .toast.info { background: #0d6efd; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .stock-price small { color: #888; margin-left: 4px; }
+        .investor-card {
+            display: inline-block;
+            width: 300px;
+            margin: 12px;
+            padding: 16px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            vertical-align: top;
+            position: relative;
+        }
+        .investor-card img {
+            width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 8px;
+        }
+        .stock-bubble {
+            display: none;
+            position: absolute;
+            left: 0; top: -120px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 14px 18px;
+            min-width: 260px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            z-index: 10;
+        }
+        .investor-card:hover .stock-bubble { display: block; }
+        .loading-container { text-align: center; margin: 40px 0; }
+        .loading-spinner {
+            width: 36px; height: 36px;
+            border: 4px solid #eee;
+            border-top: 4px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .error-container { text-align: center; color: #d9534f; margin: 40px 0; }
+        #refresh-button { margin: 18px 0; padding: 8px 18px; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>부자따라 부자되기</h1>
-        <nav>
-            <ul>
-                <li><a href="#">홈</a></li>
-                <li><a href="#">굿즈</a></li>
-            </ul>
-        </nav>
-    </header>
-    
     <main>
-        <section class="hero">
-            <h2>투자 대가들의 지혜를 따라 투자하세요</h2>
-            <p>10명의 투자 대가들이 중요하게 여기는 지표를 기반으로, 매일 종합 점수 상위 종목을 추천해드립니다.</p>
-            <div class="update-info">
-                <p>마지막 업데이트: <span id="last-updated"></span></p>
-                <button id="refresh-button">
-                    <span class="refresh-icon">↻</span> 새로고침
-                </button>
-            </div>
-        </section>
-        
-        <section class="investors">
-            <h2>투자 대가 라인업</h2>
-            <p>각 투자 대가의 카드에 마우스를 올려 추천 종목을 확인하세요</p>
-            
-            <div class="investor-grid" id="investor-grid">
-                <!-- 투자자 카드들이 여기에 동적으로 추가됩니다 -->
-            </div>
-        </section>
+        <h1>투자 대가별 추천 종목</h1>
+        <div id="investor-grid"></div>
+        <div style="margin: 12px 0; color: #888;">
+            <span>마지막 업데이트: <span id="last-updated"></span></span>
+            <button id="refresh-button">새로고침</button>
+        </div>
     </main>
-    
-    <footer>
-        <p>&copy; 2025 부자따라 부자되기. 모든 권리 보유.</p>
-    </footer>
-    
-    <!-- API 서비스 스크립트 먼저 로드 -->
-    <script src="stock-api.js"></script>
-    <!-- 종목 평가 및 순위 계산 스크립트 로드 -->
-    <script src="stock-ranking.js"></script>
-    <!-- 투자자 데이터 스크립트 로드 -->
+    <!-- 필수 스크립트 로드 순서 -->
     <script src="investor-data.js"></script>
-    <!-- 메인 스크립트 로드 -->
+    <script src="stock-api.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
